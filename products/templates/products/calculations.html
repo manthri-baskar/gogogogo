@@ -1,7 +1,12 @@
 {% extends 'base.html' %}
 
-{% block title  %} Items List {% endblock %}
+{% block title  %} actual mean & variance {% endblock %}
 
 {% block content  %}
-    {{df2|safe}}
+    {% if df2 %}
+        {{df2|safe}}
+    {% endif %}
+    {% if error %}
+        {{error|safe}}
+    {% endif %}
 {% endblock %}

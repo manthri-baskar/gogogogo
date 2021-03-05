@@ -21,20 +21,29 @@ import math
 
 @login_required(login_url='login')
 def sales_dist_view(request):
-    df = pd.DataFrame(Purchase.objects.all().values())
-    print(df)
-    df['user_id']=df['user_id'].apply(get_salesman_from_id)
-    df.rename({'user_id':'user'}, axis=1, inplace=True)
-    df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+    graph = None
+    error = None
+    try:
+        df = pd.DataFrame(Purchase.objects.filter(user=request.user).values())
+        #df['user_id']=df['user_id'].apply(get_salesman_from_id)
+        df.rename({'user_id':'user'}, axis=1, inplace=True)
+        df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+        
+        plt.switch_backend('Agg')
+        plt.xticks(rotation=90)
+        sns.barplot(x='date', y='total_price', hue='user', data=df)
+        plt.tight_layout
+        graph = get_image()
     
-    plt.switch_backend('Agg')
-    plt.xticks(rotation=90)
-    sns.barplot(x='date', y='total_price', hue='user', data=df)
-    plt.tight_layout
-    graph = get_image()
+    except:
+        error = 'No data........'
+    
+    context ={
+        'graph':graph,
+        'error':error
+    }
+    return render(request, 'products/sales.html', context)
 
-    #return HttpResponse("Hello Salesman")
-    return render(request, 'products/sales.html', {'graph':graph})
 
 @login_required(login_url='login')
 def chart_select_view(request):
@@ -43,8 +52,8 @@ def chart_select_view(request):
     graph = None
     price = None
 
-    product_df = pd.DataFrame(Product.objects.all().values())
-    purchase_df = pd.DataFrame(Purchase.objects.all().values())
+    product_df = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
+    purchase_df = pd.DataFrame(Purchase.objects.all().values().filter(user=request.user))
     if product_df.shape[0]>0 :
         product_df['product_id'] = product_df['id']
     
@@ -57,14 +66,15 @@ def chart_select_view(request):
             date_to    = request.POST.get('date_to')
 
             df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
-            df2 = df.groupby('date', as_index=False)['total_price'].agg('sum')
+            df2 = df.groupby('date', as_index=False)['quantity'].agg('sum')
 
             if chart_type!="":
                 if date_from!="" and date_to!="":
                     df = df[(df['date']>date_from)&(df['date']<date_to)]
-                    df2 = df.groupby('date', as_index=False)['total_price'].agg('sum')
+                    df2 = df.groupby('date', as_index=False)['quantity'].agg('sum')
                 # function to get a graph
-                graph = get_simple_plot(chart_type, x=df2['date'], y=df2['total_price'] ,data=df)
+                print(df2)
+                graph = get_simple_plot(chart_type, x=df2['date'], y=df2['quantity'] ,data=df)
             else:
                 error_message = 'please select a chart to continue'
 
@@ -230,13 +240,25 @@ def update_items(request,pk):
 def calculations(request):
     item_df   = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
     demand_df = pd.DataFrame(Purchase.objects.all().values().filter(user=request.user))
+    error = None
     
     if demand_df.shape[0]>0:
-        item_df['item_id'] = item_df['id']
-        df = pd.merge(item_df,demand_df,on='item_id').drop(['id_y','id_x','carrying_cost','ordering_cost','unit_costprice','lead_time','service_level','standard_deviation','average_daily_demand','total_inventory','eoq','no_of_workingdays','rq','z','user_id_y','price','recieve_quantity'],axis=1).rename({'item_id':'id'},axis=1)
+        item_df.rename(columns = {'id':'product_id'}, inplace = True)
+        df = pd.merge(item_df,demand_df,on='product_id')
+        del df['no_of_workingdays']
+        del df['z']  
+        del df['rq']
+        del df['lead_time']
+        del df['service_level']
+        del df['standard_deviation']
+        del df['carrying_cost']
+        del df['ordering_cost']
+        del df['unit_costprice']
+        del df['average_daily_demand']
+        del df['total_inventory']
         del df['user_id_x']
-        del df['id']
-        df.rename(columns = {'date':'End of the Month'}, inplace = True)
+        del df['date_y']
+        df.rename(columns = {'date_x':'End of the Month'}, inplace = True)
         df.rename(columns = {'name':'Item Name'}, inplace = True)
         df['End of the Month'] = pd.to_datetime(df['End of the Month'])
         df = df.groupby([pd.Grouper(key='End of the Month', freq='1M'),'Item Name']).aggregate({'quantity':['mean','std','count','sum']}) # groupby each 1 month
@@ -244,10 +266,11 @@ def calculations(request):
         df.rename(columns = {'mean':'Daily Average'}, inplace = True) 
         df.rename(columns = {'std':'Standard deviation'}, inplace = True) 
         df.rename(columns = {'count':'Frequency'}, inplace = True) 
-        df.rename(columns = {'sum':'Total Demand'}, inplace = True) 
-        df=df.to_html(classes=('table table-striped'))
-        return render(request,'products/calculations.html',context={'df2':df})
+        df.rename(columns = {'sum':'Total Demand'}, inplace = True)
+        return render(request,'products/calculations.html',context={'df2':df.to_html(classes=('table table-striped')), 'error':error})
 
     else:
-        error='<h3>No Data to Analyze</h3>'
-        return render(request,'products/calculations.html',context={'df2':error})
+        error='<h3>No Data to Analyze</h3>' 
+        df2 = None
+        return render(request,'products/calculations.html',context={'df2':df2, 'error':error})
+    

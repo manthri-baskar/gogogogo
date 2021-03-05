@@ -6,22 +6,20 @@
 {% url 'products:sales-view' as path_to_sales %}
 {% url 'products:demand_list_url' as path_to_demand_list %}
 {% url 'products:items_list_url' as path_to_items_list %}
-{% url 'products:demand_create_url' as path_to_demand_create %}
 {% url 'products:calculations_url' as path_to_calculations %}
 
 <div class="ui inverted segment">
     <div class="ui inverted secondary pointing menu">
-        <a class="item">Home</a>
-        <a href="{% url 'products:demand_list_url' %}" class="{% if request.path == path_to_demand_list %}active{% endif %} item">History</a>
-        <a href="{% url 'products:items_list_url' %}" class="{% if request.path == path_to_items_list %}active{% endif %} item">Inventory Data</a>
-        <a href="{% url 'products:demand_create_url' %}" class="{% if request.path == path_to_demand_create %}active{% endif %} item">Sales</a>
-        <a href="{% url 'products:calculations_url' %}" class="{% if request.path == path_to_calculations %}active{% endif %} item">Analysis</a>
-
-        <a href={{path_to_performance}} class="{% if request.path == path_to_performance %}active{% endif %} item">performance</a>
-        <a href={{path_to_adding_records}} class="{% if request.path == path_to_adding_records %}active{% endif %} item">add_records</a>
-        <a href={{path_to_sales}} class="{% if request.path == path_to_sales %}active{% endif %} item">sales</a>
-        <a href={{path_to_customers}} class="{% if request.path == path_to_customers %}active{% endif %} item">customers</a>
-        <a href={{path_to_upload}} class="{% if request.path == path_to_upload %}active{% endif %} item">upload</a>   
-        <a href={{path_to_upload_product}} class="{% if request.path == path_to_upload_product %}active{% endif %} item">upload products</a>            
+        <a href="{% url 'products:items_list_url' %}" class="{% if request.path == path_to_items_list %}active{% endif %} item">&lt;&lt;&lt; back</a>
+        <a href={{path_to_adding_records}} class="{% if request.path == path_to_adding_records %}active{% endif %} item">Add-records</a>
+        <a href={{path_to_performance}} class="{% if request.path == path_to_performance %}active{% endif %} item">Charts</a>
+        <a href={{path_to_sales}} class="{% if request.path == path_to_sales %}active{% endif %} item">Sales</a>
+        <a href={{path_to_customers}} class="{% if request.path == path_to_customers %}active{% endif %} item">Customers</a>
+        <div class="ui left pointing dropdown link item">Upload <i class="dropdown icon"></i>
+            <div class="menu">
+                <a href={{path_to_upload_product}} class="item">items-details</a>
+                <a href={{path_to_upload}} class="item">purchases</a>
+            </div>
+        </div>
     </div>
 </div>

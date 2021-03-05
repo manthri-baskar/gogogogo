@@ -23,18 +23,22 @@ def upload_file_view(request):
                 reader = csv.reader(f)
                 for row in reader:
                     user = request.user
-                    prod = Product.objects.get(name=row[0].upper())
-                    Purchase.objects.create(
-                        product = prod,
-                        price = int(row[2]),
-                        quantity = int(row[1]),
-                        user = user,
-                        date = row[4],
-                    )
+                    try:
+                        prod = Product.objects.get(name=row[0].upper(), user=request.user)
+                        Purchase.objects.create(
+                            product = prod,
+                            price = float(row[2]),
+                            quantity = float(row[1]),
+                            user = user,
+                            date = row[4],
+                        )
+                        success_message = 'successfully uploaded.'
+                    except:
+                        error_message = 'Some of the items in the file maynot have uploaded.........'
+
             
             obj.activated=True
             obj.save()
-            success_message = 'successfully uploaded.'
 
         except:
             error_message = 'Oops, something went wrong......'
@@ -62,19 +66,19 @@ def upload_product_file_view(request):
                 reader = csv.reader(f)
                 for row in reader:
                     try:
-                        prod = Product.objects.get(name=row[0].upper())
+                        prod = Product.objects.get(name=row[0].upper(), user=request.user)
                     except:
                         Product.objects.create(
                             user                 = request.user,
                             name                 = row[0].upper(),
                             date                 = row[1],
-                            average_daily_demand = int(row[2]),
-                            standard_deviation   = int(row[3]),
-                            carrying_cost        = int(row[4]),
-                            ordering_cost        = int(row[5]),
-                            unit_costprice       = int(row[6]),
-                            total_inventory      = int(row[7]),
-                            lead_time            = int(row[8]),
+                            average_daily_demand = float(row[2]),
+                            standard_deviation   = float(row[3]),
+                            carrying_cost        = float(row[4]),
+                            ordering_cost        = float(row[5]),
+                            unit_costprice       = float(row[6]),
+                            total_inventory      = float(row[7]),
+                            lead_time            = float(row[8]),
                             service_level        = int('90'),
                             no_of_workingdays    = int('300'),
                             z                    = float('1.28'),

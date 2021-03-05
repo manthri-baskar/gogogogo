@@ -45,6 +45,7 @@ def get_simple_plot(chart_type, *args, **kwargs):
     else:
         title = 'Number of times product got sold'
         plt.title(title)
+        print(data)
         sns.countplot('name', data=data)
 
     plt.xticks(rotation=90)

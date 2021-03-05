@@ -34,17 +34,12 @@
         <ul class="navbar-nav">
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:demand_list_url' %}">History</a></li>
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:items_list_url' %}">Inventory Data</a></li>
-          <li class="nav-item active"><a class="nav-link" href="{% url 'products:demand_create_url' %}">Sales</a></li>
+          <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">Add-records</a></li>
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:calculations_url' %}">Analysis</a></li>
-          
-          <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">performance</a></li>
-          <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">add_records</a></li>
-          <li class="nav-item active"><a class="nav-link" href="{% url 'products:sales-view' %}">sales</a></li>
-          <li class="nav-item active"><a class="nav-link" href="{% url 'customers:main-customer-view' %}">customers</a></li>
-          <li class="nav-item active"><a class="nav-link" href="{% url 'csvs:upload-view' %}">upload</a></li>
+          <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Upload & Analysis</a></li>
         </ul>
       </div>
-      <span class="hello-msg">Welcome , {{  request.user}}</span>
+      <span class="hello-msg">Welcome, {{request.user}}</span>
       <span ><a  class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
     </nav>
   {% endif %}

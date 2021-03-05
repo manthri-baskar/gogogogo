@@ -3,8 +3,14 @@
 {% block title %}sales{% endblock title %}
 
 {% block content %}
-<h1>Sales</h1>
+
+<u><h1>Sales</h1></u>
 {% if graph %}
     <img src="data:image/png;base64, {{ graph | safe}}">
 {% endif %}
+
+{% if error %}
+    <h1>{{ error }}</h1>
+{% endif %}
+
 {% endblock content %}
