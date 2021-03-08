@@ -4,12 +4,12 @@
 
 {% block content %} 
     <div class="ui modal mymodal">
-        <div class="header"><h1>Price data</h1></div>
+        <div class="header"><h1>Demand</h1></div>
         <div class="ui container">
             <ul>
-                <li><strong>Count: </strong>{{ price.count}}</li>
-                <li><strong>Mean: </strong>{{ price.mean}}</li>
-                <li><strong>Std dev: </strong>{{ price.std|floatformat}}</li>
+                <li><strong>Count: </strong>{{ Quantity.count}}</li>
+                <li><strong>Mean: </strong>{{ Quantity.mean}}</li>
+                <li><strong>Std dev: </strong>{{ Quantity.std|floatformat}}</li>
             </ul>
         </div>
     </div>
@@ -34,7 +34,7 @@
             <div class="field">
                 <label>Choose a chart type: </label>
                 <div class="ui selection dropdown">
-                    <input type="hidden" name="sales">
+                    <input type="hidden" name="plot">
                     <i class="dropdown icon"></i>
                     <div class="default text">----</div>
                     <div class="menu">
@@ -43,6 +43,10 @@
                         <div class="item" value="count">Count plot</div>
                     </div>
                 </div>
+            </div>
+            <div class="field">
+                <label>Item: </label>
+                <input type="text" name="item">
             </div>
             <div class="field">
                 <div class="two fields">
@@ -62,8 +66,13 @@
         </form>
         <div class="block-center">
             <button class='ui secondary button' id='modal-btn'>See summary</button>
-            <br>
-            <a href={% url 'products:add-purchase-view' %}><button class="ui positive button">Add records</button></a>
+            <br><br>
+        </div>
+        <div>
+            <h2><u>Items:</u></h2>
+            {% for a in items %}
+                {{a}}<br>
+            {% endfor %}
         </div>
     </div>
 {% endblock content %}

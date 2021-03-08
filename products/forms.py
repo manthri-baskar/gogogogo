@@ -30,3 +30,13 @@ class ItemSearchForm(forms.ModelForm):
    class Meta:
         model = Product
         fields = ['name']
+
+class select_item(forms.ModelForm):
+    class Meta:
+        model  = Purchase
+        fields = ['product']
+
+    def __init__(self,user=None,*args,**kwargs):
+        super(select_item,self).__init__(*args,**kwargs)
+        if user:
+            self.fields['product'].queryset=Product.objects.filter(user=user)

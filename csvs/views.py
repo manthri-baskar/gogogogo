@@ -34,7 +34,7 @@ def upload_file_view(request):
                         )
                         success_message = 'successfully uploaded.'
                     except:
-                        error_message = 'Some of the items in the file maynot have uploaded.........'
+                        error_message = 'Some of the items in the file maynot have uploaded or check the date format, it should be in y-m-d format.........'
 
             
             obj.activated=True

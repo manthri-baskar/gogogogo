@@ -35,11 +35,11 @@ def get_simple_plot(chart_type, *args, **kwargs):
     y    = kwargs.get('y')
     data = kwargs.get('data')
     if chart_type =='bar plot':
-        title = 'total price per day'
+        title = 'demand per day'
         plt.title(title)
         plt.bar(x, y)
     elif chart_type =='line plot':
-        title = 'total price per day'
+        title = 'demand per day'
         plt.title(title)
         plt.plot(x, y)
     else:

@@ -50,31 +50,38 @@ def chart_select_view(request):
     error_message = None
     df = None
     graph = None
-    price = None
+    Quantity = None
 
-    product_df = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
+    product_df  = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
     purchase_df = pd.DataFrame(Purchase.objects.all().values().filter(user=request.user))
+    
+    items = Product.objects.all()
     if product_df.shape[0]>0 :
         product_df['product_id'] = product_df['id']
     
     if purchase_df.shape[0]>0 :
         df = pd.merge(purchase_df, product_df, on='product_id').drop(['id_y', 'date_y'], axis=1).rename({'id_x':'id', 'date_x':'date'}, axis=1)
-        price = df['price']
         if request.method == 'POST':
-            chart_type = request.POST.get('sales')
+            chart_type = request.POST.get('plot')
             date_from  = request.POST.get('date_from') 
             date_to    = request.POST.get('date_to')
-
+            item       = request.POST.get('item')
+            
             df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
-            df2 = df.groupby('date', as_index=False)['quantity'].agg('sum')
-
+            df2        = df.groupby(['date','name'], as_index=False)['quantity'].agg('sum')
+            df2        = df2[df2["name"].isin([item])]
+            Quantity = df2['quantity']     
+            
             if chart_type!="":
-                if date_from!="" and date_to!="":
-                    df = df[(df['date']>date_from)&(df['date']<date_to)]
-                    df2 = df.groupby('date', as_index=False)['quantity'].agg('sum')
-                # function to get a graph
-                print(df2)
-                graph = get_simple_plot(chart_type, x=df2['date'], y=df2['quantity'] ,data=df)
+                if item!="":
+                    if date_from!="" and date_to!="":
+                        df  = df[(df['date']>date_from)&(df['date']<date_to)]
+                        df2 = df.groupby(['date','name'], as_index=False)['quantity'].agg('sum')
+                        df2 = df2[df2["name"].isin([item])]
+                    # function to get a graph
+                    graph = get_simple_plot(chart_type, x=df2['date'], y=df2['quantity'] ,data=df)
+                else:
+                    error_message = 'please enter an item to continue'
             else:
                 error_message = 'please select a chart to continue'
 
@@ -84,10 +91,10 @@ def chart_select_view(request):
     context ={
         'error_message': error_message,
         'graph' : graph,
-        'price' : price,
+        'Quantity' : Quantity,
+        'items' : items,
         #'products' : product_df.to_html(),
         #'purchase' : purchase_df.to_html(),
-        #'df'       : df,
     }
     return render(request, 'products/main.html', context)
 
