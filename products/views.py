@@ -8,7 +8,7 @@ from django.views.generic import TemplateView, View
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
 from .models import Product, Purchase
-from .utils import get_simple_plot, get_salesman_from_id, get_image
+from .utils import *
 from numpy.core.fromnumeric import product
 from .forms import *
 import pandas as pd
@@ -19,7 +19,7 @@ import math
 
 # Create your views here.
 
-@login_required(login_url='login')
+'''@login_required(login_url='login')
 def sales_dist_view(request):
     graph = None
     error = None
@@ -42,7 +42,7 @@ def sales_dist_view(request):
         'graph':graph,
         'error':error
     }
-    return render(request, 'products/sales.html', context)
+    return render(request, 'products/sales.html', context)'''
 
 
 @login_required(login_url='login')
@@ -264,8 +264,8 @@ def calculations(request):
         del df['average_daily_demand']
         del df['total_inventory']
         del df['user_id_x']
-        del df['date_y']
-        df.rename(columns = {'date_x':'End of the Month'}, inplace = True)
+        del df['date_x']
+        df.rename(columns = {'date_y':'End of the Month'}, inplace = True)
         df.rename(columns = {'name':'Item Name'}, inplace = True)
         df['End of the Month'] = pd.to_datetime(df['End of the Month'])
         df = df.groupby([pd.Grouper(key='End of the Month', freq='1M'),'Item Name']).aggregate({'quantity':['mean','std','count','sum']}) # groupby each 1 month
@@ -274,6 +274,8 @@ def calculations(request):
         df.rename(columns = {'std':'Standard deviation'}, inplace = True) 
         df.rename(columns = {'count':'Frequency'}, inplace = True) 
         df.rename(columns = {'sum':'Total Demand'}, inplace = True)
+        df2 = pd.merge(df, df[('Demand', 'Total Demand')]/30)
+        
         return render(request,'products/calculations.html',context={'df2':df.to_html(classes=('table table-striped')), 'error':error})
 
     else:

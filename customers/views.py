@@ -5,8 +5,8 @@ import seaborn as sns
 from .models import Customer
 from products.utils import get_image
 
-# Create your views here.
-
+# Create your views here. 
+ 
 def customer_corr_view(request):
     df = pd.DataFrame(Customer.objects.all().values())
     corr = round(df['budget'].corr(df['employment']),2)
