@@ -26,11 +26,11 @@ def upload_file_view(request):
                     try:
                         prod = Product.objects.get(name=row[0].upper(), user=request.user)
                         Purchase.objects.create(
-                            product = prod,
-                            price = float(row[2]),
+                            product  = prod,
                             quantity = float(row[1]),
-                            user = user,
-                            date = row[4],
+                            price    = float(row[2]),
+                            date     = row[3],
+                            user     = user,
                         )
                         success_message = 'successfully uploaded.'
                     except:
@@ -49,10 +49,7 @@ def upload_file_view(request):
         'success_message' : success_message,
     }
     return render(request, 'csvs/upload.html', context)
-
-    
-
-
+ 
 def upload_product_file_view(request):
     error_message   = None
     success_message = None
@@ -62,7 +59,7 @@ def upload_product_file_view(request):
         form = CsvForm() 
         try:
             obj = Csv.objects.get(activated=False)
-            with open(obj.file_name.path, 'r', encoding='utf-8') as f:
+            with open(obj.file_name.path, 'r', encoding='unicode_escape') as f:
                 reader = csv.reader(f)
                 for row in reader:
                     try:

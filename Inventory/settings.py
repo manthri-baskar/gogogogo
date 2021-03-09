@@ -141,3 +141,5 @@ django_heroku.settings(locals())
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'static_cdn', 'media_root')
+
+DATA_UPLOAD_MAX_NUMBER_FIELDS = 50000 # higher than the count of fields

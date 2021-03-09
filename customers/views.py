@@ -9,7 +9,6 @@ from products.utils import get_image
 
 def customer_corr_view(request):
     df = pd.DataFrame(Customer.objects.all().values())
-    print(df['budget'])
     corr = round(df['budget'].corr(df['employment']),2)
     
     plt.switch_backend('Agg')

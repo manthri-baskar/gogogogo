@@ -55,7 +55,8 @@ def chart_select_view(request):
     product_df  = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
     purchase_df = pd.DataFrame(Purchase.objects.all().values().filter(user=request.user))
     
-    items = Product.objects.all()
+    items = Product.objects.all().filter(user=request.user)
+
     if product_df.shape[0]>0 :
         product_df['product_id'] = product_df['id']
     
@@ -160,7 +161,6 @@ def demand_list(request,*args,**kwargs):
 @login_required(login_url='login')
 def DemandCreate(request):
         form = PurchaseForm(request.user)
-
         if request.method == 'POST':
             form = PurchaseForm(request.user,request.POST) 
             if form.is_valid():
