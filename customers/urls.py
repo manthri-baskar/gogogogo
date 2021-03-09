@@ -3,6 +3,6 @@ from .views import customer_corr_view
 
 app_name = 'customers'
 
-urlpatterns = [
+urlpatterns = [ 
     path('', customer_corr_view, name='main-customer-view'),
 ]

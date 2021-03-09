@@ -7,5 +7,5 @@ class Customer(models.Model):
     employment = models.PositiveIntegerField()
     joined = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
+    def __str__(self): 
         return str(self.company_name)
