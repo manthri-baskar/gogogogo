@@ -71,7 +71,7 @@ def chart_select_view(request):
             df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
             df2        = df.groupby(['date','name'], as_index=False)['quantity'].agg('sum')
             df2        = df2[df2["name"].isin([item])]
-            Quantity = df2['quantity']     
+            Quantity = df2['quantity']   
             
             if chart_type!="":
                 if item!="":
@@ -252,30 +252,25 @@ def calculations(request):
     if demand_df.shape[0]>0:
         item_df.rename(columns = {'id':'product_id'}, inplace = True)
         df = pd.merge(item_df,demand_df,on='product_id')
-        del df['no_of_workingdays']
-        del df['z']  
-        del df['rq']
-        del df['lead_time']
-        del df['service_level']
-        del df['standard_deviation']
-        del df['carrying_cost']
-        del df['ordering_cost']
-        del df['unit_costprice']
-        del df['average_daily_demand']
-        del df['total_inventory']
-        del df['user_id_x']
-        del df['date_x']
-        df.rename(columns = {'date_y':'End of the Month'}, inplace = True)
-        df.rename(columns = {'name':'Item Name'}, inplace = True)
-        df['End of the Month'] = pd.to_datetime(df['End of the Month'])
-        df = df.groupby([pd.Grouper(key='End of the Month', freq='1M'),'Item Name']).aggregate({'quantity':['mean','std','count','sum']}) # groupby each 1 month
-        df.rename(columns = {'quantity':'Demand'}, inplace = True) 
-        df.rename(columns = {'mean':'Daily Average'}, inplace = True) 
-        df.rename(columns = {'std':'Standard deviation'}, inplace = True) 
-        df.rename(columns = {'count':'Frequency'}, inplace = True) 
-        df.rename(columns = {'sum':'Total Demand'}, inplace = True)
-        df2 = pd.merge(df, df[('Demand', 'Total Demand')]/30)
+        df['date_y'] = pd.to_datetime(df['date_y'], format='%y-%m-%d')
+        df = df.groupby(['date_y','name'], as_index=False).aggregate({'quantity':'sum', 'total_price':'sum'})
         
+        df.rename(columns = {'name':'Item Name'}, inplace = True)
+        df['Year/Month'] = df['date_y'].dt.strftime('%Y/%m')
+        df = df.groupby(['Year/Month','Item Name']).aggregate({'quantity':['mean','std','count','sum']}) # groupby each 1 month
+        
+        df['Daily Average']=df['quantity']['sum']/30 
+        a = df['quantity']['count']/30
+        b = df['quantity']['std']*df['quantity']['std'] + df['quantity']['mean']*df['quantity']['mean']
+        c = df['Daily Average']*df['Daily Average']
+        d = a*b-c
+        df['Standard deviation'] = d.transform(lambda x:x**0.5)
+        df['Total demand'] = df['quantity']['sum']
+        df['Frequency']    = df['quantity']['count']
+
+        del df['quantity']
+        df.columns = df.columns.droplevel(1)
+
         return render(request,'products/calculations.html',context={'df2':df.to_html(classes=('table table-striped')), 'error':error})
 
     else:
