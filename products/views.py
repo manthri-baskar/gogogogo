@@ -7,9 +7,9 @@ from django.db.models.expressions import F
 from django.views.generic import TemplateView, View 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
+from numpy.core.fromnumeric import product
 from .models import Product, Purchase
 from .utils import *
-from numpy.core.fromnumeric import product
 from .forms import *
 import pandas as pd
 import numpy as np
@@ -18,32 +18,6 @@ import seaborn as sns
 import math
 
 # Create your views here.
-
-'''@login_required(login_url='login')
-def sales_dist_view(request):
-    graph = None
-    error = None
-    try:
-        df = pd.DataFrame(Purchase.objects.filter(user=request.user).values())
-        #df['user_id']=df['user_id'].apply(get_salesman_from_id)
-        df.rename({'user_id':'user'}, axis=1, inplace=True)
-        df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
-        
-        plt.switch_backend('Agg')
-        plt.xticks(rotation=90)
-        sns.barplot(x='date', y='total_price', hue='user', data=df)
-        plt.tight_layout
-        graph = get_image()
-    
-    except:
-        error = 'No data........'
-    
-    context ={
-        'graph':graph,
-        'error':error
-    }
-    return render(request, 'products/sales.html', context)'''
-
 
 @login_required(login_url='login')
 def chart_select_view(request):
@@ -108,16 +82,16 @@ def add_purchase_view(request):
                 n = form.cleaned_data["product"]
                 l = form.cleaned_data["quantity"]
                 c = form.cleaned_data["price"]
-                o = form.cleaned_data["recieve_quantity"]
+                o = form.cleaned_data["recieved"]
                 d = form.cleaned_data["date"]
 
-                reporter = request.user.products.get(name=n)
+                reporter = request.user.items.get(name=n, user=request.user)
                 reporter.total_inventory = F('total_inventory')-l+o
                 reporter.save()
-                t = Purchase(product=n,quantity=l,price=c,recieve_quantity=o,date=d)
+                t = Purchase(product=n,quantity=l,price=c,recieved=o,date=d)
                 t.save()
-                request.user.purchases.add(t)
-
+                request.user.demand.add(t)
+                
                 return redirect('products:add-purchase-view')
                     
         return render(request,'products/add.html',context={'form':PurchaseForm(request.user) })
@@ -157,29 +131,6 @@ def demand_list(request,*args,**kwargs):
         messages.info(request,"No purchases has been recorded.....")
 
     return render(request,'products/demand_list.html',context={'demand':itee})
-
-@login_required(login_url='login')
-def DemandCreate(request):
-        form = PurchaseForm(request.user)
-        if request.method == 'POST':
-            form = PurchaseForm(request.user,request.POST) 
-            if form.is_valid():
-                n = form.cleaned_data["product"]
-                l = form.cleaned_data["quantity"]
-                c = form.cleaned_data["price"]
-                o = form.cleaned_data["recieved"]
-                d = form.cleaned_data["date"]
-
-                reporter = request.user.items.get(name=n)
-                reporter.total_inventory = F('total_inventory')-l+o
-                reporter.save()
-                t = Purchase(product=n,quantity=l,price=c,recieved=o,date=d)
-                t.save()
-                request.user.demand.add(t)
-
-                return redirect('product:demand_create_url')
-                    
-        return render(request,'products/demand_create.html',context={'form':PurchaseForm(request.user) })
 
 @login_required(login_url='login')
 def ItemCreate(request):
@@ -277,4 +228,29 @@ def calculations(request):
         error='<h3>No Data to Analyze</h3>' 
         df2 = None
         return render(request,'products/calculations.html',context={'df2':df2, 'error':error})
+
+
+'''@login_required(login_url='login')
+def sales_dist_view(request):
+    graph = None
+    error = None
+    try:
+        df = pd.DataFrame(Purchase.objects.filter(user=request.user).values())
+        #df['user_id']=df['user_id'].apply(get_salesman_from_id)
+        df.rename({'user_id':'user'}, axis=1, inplace=True)
+        df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
+        
+        plt.switch_backend('Agg')
+        plt.xticks(rotation=90)
+        sns.barplot(x='date', y='total_price', hue='user', data=df)
+        plt.tight_layout
+        graph = get_image()
     
+    except:
+        error = 'No data........'
+    
+    context ={
+        'graph':graph,
+        'error':error
+    }
+    return render(request, 'products/sales.html', context)'''    

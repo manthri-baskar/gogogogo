@@ -36,16 +36,29 @@
           <tbody>            
             {% if item.total_inventory <= item.rq %}
               <tr style="color: red;">
-            {% else %}
-              <tr>            
-            {% endif %}
                 <th scope="row">{{ item.name }}</th>
                 <td>{{item.total_inventory}}</td>
                 <td>{{item.eoq}}</td>
                 <td>{{item.rq}}</td>
                 <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
                 <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
-              </tr>
+              </tr>         
+            {% endif %}
+          </tbody>
+      {% endfor %}
+
+      {% for item in items %}
+          <tbody>            
+            {% if item.total_inventory > item.rq %}
+              <tr>
+                <th scope="row">{{ item.name }}</th>
+                <td>{{item.total_inventory}}</td>
+                <td>{{item.eoq}}</td>
+                <td>{{item.rq}}</td>
+                <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
+                <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
+              </tr>         
+            {% endif %}
           </tbody>
       {% endfor %}
     </table>
