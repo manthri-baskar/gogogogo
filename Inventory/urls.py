@@ -27,7 +27,8 @@ urlpatterns = [
     path('logout/', v.logoutUser, name="logout"),
     path('performance/', include('products.urls', namespace="products")),
     path('upload/', include('csvs.urls', namespace="csvs")),
-    path('customers/', include('customers.urls', namespace="customer"))
+    path('customers/', include('customers.urls', namespace="customer")),
+    path('goods/', include('goods.urls', namespace="goods"))
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, redirect
 from .forms import RegisterForm
 from django.contrib import messages

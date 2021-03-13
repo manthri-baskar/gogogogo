@@ -37,6 +37,8 @@
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">Add-records</a></li>
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:calculations_url' %}">Analysis</a></li>
           <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Upload & Analysis>>></a></li>
+          <li class="nav-item active"><a class="nav-link" href="{% url 'goods:goods_form_url' %}">Add Goods</a></li>
+          <li class="nav-item active"><a class="nav-link" href="{% url 'goods:amount_form_url' %}">Add amount</a></li>
         </ul>
       </div>
       <span class="hello-msg">Welcome, {{request.user}}</span>

@@ -1,10 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
-import math
-import scipy.stats as st
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+import math
+import scipy.stats as st
 
 # validation
 

@@ -1,0 +1,18 @@
+{% extends 'base1.html'%}
+
+{% block title %} add goods{% endblock title %}
+
+{% block content %}
+    {% if added_message %}
+        <div class="ui success message">
+            <i class="close icon"></i>
+            <div class="header">{{ added_message }}</div>
+        </div>    
+    {% endif %}
+    <h1>Add</h1>
+    <form action="" method="POST" class="ui form">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type='submit' class="ui positive button block-center mtop">Add goods</button>
+    </form>
+{% endblock content%}
