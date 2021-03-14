@@ -28,12 +28,11 @@ def goods_form_view(request):
 
             t = Goods(good_name=a, setup_cost=b, production_cost=c, holding_cost=d, production_rate=e, production_quantity=f, total_demand=h)
             t.save()
-            for i in g:
-                z = Product.objects.get(name=i)
-                print('////=============', z.id)
-                #t.raw_material.add(z.id, through_defaults={'date_joined': required_amount})
+            for raw_mate in g:
+                z = Product.objects.get(name=raw_mate)
+                t.raw_material.add(z.id, through_defaults={'required_amount': 55})
 
-            request.user.good.add(t)
+            #request.user.good.add(t)
             
             return redirect('goods:goods_form_url')
                     
@@ -41,18 +40,14 @@ def goods_form_view(request):
 
 @login_required(login_url='login')
 def amount_form_view(request):
-    form = AmountForm()
-    if request.method == 'POST':
-        form=GoodsForm(request.POST) 
-        if form.is_valid():
-            a = form.cleaned_data["goods"]
-            b = form.cleaned_data["raw_material"]
-            c = form.cleaned_data["required_amount"]
-            
-            t = Goods(goods=a, raw_material=b, required_amount=c)
-            t.save()
-            
-            return redirect('goods/add_amount.html')
-                    
-    return render(request,'goods/add_amount.html',context={'form': form})
+    all_goods = Goods.objects.all()
+    if request.method == "POST":
+        for a_good in all_goods:
+            for a_raw in a_good.raw_material.all():
+                x = str(a_good.good_name)+' -> '+str(a_raw)
+                req_amount = request.POST.get(x)
+                a_good.raw_material.remove(a_raw)
+                t = Amount(goods=a_good, raw_mate=a_raw, required_amount= req_amount)
+                t.save()
 
+    return render(request,'goods/add_amount.html', context={'all_goods':all_goods})

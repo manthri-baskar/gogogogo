@@ -26,15 +26,19 @@ class Goods(models.Model):
     def __str__(self):
         return self.good_name
 
+    def save(self, *args, **kwargs):
+        self.good_name = self.good_name.upper()
+        return super().save(*args, **kwargs)
+
 
 class Amount(models.Model):
     goods           = models.ForeignKey(Goods, on_delete=models.CASCADE)
-    raw_material    = models.ForeignKey(Product, on_delete=models.CASCADE)
+    raw_mate        = models.ForeignKey(Product, on_delete=models.CASCADE)
     required_amount = models.FloatField(validators=[validate_positive])
 
     # To have unique pairs of goods and raw_material 
     class Meta:
-        unique_together = [['goods', 'raw_material']]
+        unique_together = [['goods', 'raw_mate']]
 
     def __str__(self):
-        return '{} - {}'.format(self.goods,self.raw_material)
+        return '{} - {}'.format(self.goods,self.raw_mate)

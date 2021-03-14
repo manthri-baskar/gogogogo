@@ -1,18 +1,26 @@
-{% extends 'base1.html'%}
-
-{% block title %} add goods{% endblock title %}
+{% extends 'base.html' %}
+{% block title %} add purchase{% endblock title %}
 
 {% block content %}
-    {% if added_message %}
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">{{ added_message }}</div>
-        </div>    
-    {% endif %}
-    <h1>Add</h1>
-    <form action="" method="POST" class="ui form">
+    <h2 style="color:rgb(7, 4, 218);"><u>Enter amount of each raw material required for each good</u></h2>
+    <br>
+    <form method='POST' action="{% url 'goods:amount_form_url' %}" class="">
         {% csrf_token %}
-        {{ form.as_p }}
-        <button type='submit' class="ui positive button block-center mtop">Add goods</button>
+        
+        {% for a_good in all_goods %}
+            <h4><u>{{a_good.good_name}}</u>:</h4>
+            {% if a_good.raw_material.all %}
+                {% for a_raw in a_good.raw_material.all %}
+                    <label for="colFormLabel" class="col-sm-6 col-form-label">{{a_raw}}</label>
+                    <input type="number" class="col-sm-2" placeholder="" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
+                {% endfor %}
+                <br>
+            {% else %}
+                <h5 style="color:darkcyan;">no raw materials are entered for this good...</h5><br>
+            {% endif %}
+        {% endfor %}
+
+        <input type="submit" class="btn btn-info" value='save'/>
     </form>
-{% endblock content%}
+
+{% endblock %}
