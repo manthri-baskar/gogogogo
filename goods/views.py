@@ -8,9 +8,9 @@ from .forms import *
 
 @login_required(login_url='login')
 def goods_form_view(request):
-    form = GoodsForm()
+    form = GoodsForm(request.user)
     if request.method == 'POST':
-        form=GoodsForm(request.POST) 
+        form=GoodsForm(request.user, request.POST) 
         if form.is_valid():
             a = form.cleaned_data["good_name"]
             b = form.cleaned_data["setup_cost"]
@@ -36,11 +36,11 @@ def goods_form_view(request):
             
             return redirect('goods:goods_form_url')
                     
-    return render(request,'goods/add_goods.html',context={'form': form})
+    return render(request,'goods/add_goods.html',context={'form': GoodsForm(request.user)})
 
 @login_required(login_url='login')
 def amount_form_view(request):
-    all_goods  = Goods.objects.all()
+    all_goods  = Goods.objects.all().filter(user=request.user)
     all_Amount = Amount.objects.all()
     if request.method == "POST":
         for a_good in all_goods:
@@ -52,3 +52,18 @@ def amount_form_view(request):
                 t.save()
 
     return render(request,'goods/add_amount.html', context={'all_goods':all_goods, 'all_Amount':all_Amount})
+
+
+@login_required(login_url='login')
+def delete_goods(request,pk):
+    query_set = Goods.objects.get(id=pk)
+    
+    if request.method =='POST':
+        query_set.delete()
+        messages.success(request,query_set.good_name + ' Removed')
+        return redirect('goods:goods_form_url')
+    
+    context={
+        'good':query_set.good_name
+        }
+    return render(request,'goods/delete_goods.html',context)

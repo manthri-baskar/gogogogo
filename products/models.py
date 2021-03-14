@@ -49,7 +49,7 @@ class Product(models.Model):
         b = float(self.unit_costprice)*float(self.carrying_cost)/100
         self.eoq  = math.sqrt(a/b)
         self.z    = (st.norm.ppf(self.service_level/100))
-        self.rq   = (self.lead_time*self.average_daily_demand)+(self.z*self.standard_deviation*(self.lead_time))
+        self.rq   = float(self.lead_time)*float(self.average_daily_demand)+float(self.z)*float(self.standard_deviation)*float(self.lead_time)
         return super().save(*args, **kwargs)
 
 class Purchase(models.Model):

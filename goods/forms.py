@@ -14,3 +14,8 @@ class GoodsForm(forms.ModelForm):
     def clean_name(self):
         name = self.cleaned_data.get('good_name').upper()
         return name
+
+    def __init__(self,user=None,*args,**kwargs):
+        super(GoodsForm,self).__init__(*args,**kwargs)
+        if user:
+            self.fields['raw_material'].queryset=Product.objects.filter(user=user)

@@ -13,7 +13,7 @@
       </tr>
     </thead>
     
-    {% for d in demand %}
+    {% for d in posts %}
     <tbody>
       <tr>
         <th scope="row">{{ d.product }}</th>
@@ -24,4 +24,5 @@
     </tbody>
     {% endfor %}
   </table>
+  {% include "products/pagination.html" with page=posts %}
 {% endblock %}

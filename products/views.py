@@ -7,6 +7,7 @@ from django.db.models.expressions import F
 from django.views.generic import TemplateView, View 
 from django.core.exceptions import ObjectDoesNotExist, ValidationError
 from django.http import HttpResponse
+from django.core.paginator import Paginator, EmptyPage,PageNotAnInteger
 from numpy.core.fromnumeric import product
 from .models import Product, Purchase
 from .utils import *
@@ -127,10 +128,20 @@ def demand_list(request,*args,**kwargs):
     
     try:
         itee=request.user.demand.all()
+        paginator = Paginator(itee, 30) # 3 posts in each page
+        page = request.GET.get('page')
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            # If page is not an integer deliver the first page
+            posts = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range deliver last page of results
+            posts = paginator.page(paginator.num_pages)
     except ObjectDoesNotExist:
         messages.info(request,"No purchases has been recorded.....")
 
-    return render(request,'products/demand_list.html',context={'demand':itee})
+    return render(request,'products/demand_list.html',context={'page': page, 'posts': posts})
 
 @login_required(login_url='login')
 def ItemCreate(request):

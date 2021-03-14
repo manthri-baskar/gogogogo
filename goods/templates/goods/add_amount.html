@@ -4,6 +4,7 @@
 {% block content %}
     <h3 style="color:rgb(7, 4, 218);"><u>Enter amount of each raw material required for each good</u></h3>
     <br>
+    
     <form method='POST' action="{% url 'goods:amount_form_url' %}" class="">
         {% csrf_token %}
         
