@@ -30,9 +30,9 @@ def goods_form_view(request):
             t.save()
             for raw_mate in g:
                 z = Product.objects.get(name=raw_mate)
-                t.raw_material.add(z.id, through_defaults={'required_amount': 55})
+                t.raw_material.add(z.id, through_defaults={'required_amount': 0})
 
-            #request.user.good.add(t)
+            request.user.good.add(t)
             
             return redirect('goods:goods_form_url')
                     
@@ -40,7 +40,8 @@ def goods_form_view(request):
 
 @login_required(login_url='login')
 def amount_form_view(request):
-    all_goods = Goods.objects.all()
+    all_goods  = Goods.objects.all()
+    all_Amount = Amount.objects.all()
     if request.method == "POST":
         for a_good in all_goods:
             for a_raw in a_good.raw_material.all():
@@ -50,4 +51,4 @@ def amount_form_view(request):
                 t = Amount(goods=a_good, raw_mate=a_raw, required_amount= req_amount)
                 t.save()
 
-    return render(request,'goods/add_amount.html', context={'all_goods':all_goods})
+    return render(request,'goods/add_amount.html', context={'all_goods':all_goods, 'all_Amount':all_Amount})
