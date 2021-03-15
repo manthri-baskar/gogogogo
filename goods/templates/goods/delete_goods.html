@@ -1,5 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <form action="{% url 'goods:delete_goods_url' %}" method="POST" class="">
+        {% csrf_token %}  
+        <div class="form-group">
+            <label for="inputState">Choose action:</label>
+            <select id="inputState" name="action" class="form-control">
+                <option selected>---------</option>
+                <option value="raw_material">Delete a raw material</option>
+                <option value="good_name">Delete a good</option>
+                <option value="good_raw">Remove particular raw material of a good</option>
+            </select>
+            <br>
+            <label for="exampleDataList" class="form-label">Good:</label>
+            <input class="form-control" list="datalistOptions1" id="exampleDataList" placeholder="enter NA if not applicable" type="text" name="good">
+            <datalist id="datalistOptions1">
+                {% for a_good in all_goods %}
+                    <option value="{{ a_good.good_name }}">
+                {% endfor %}
+            </datalist>
+            <br>
+            <label for="exampleDataList" class="form-label">Raw material:</label>
+            <input class="form-control" list="datalistOptions2" id="exampleDataList" placeholder="enter NA if not applicable" type="text" name="raw_mat">
+            <datalist id="datalistOptions2">
+                {% for a_raw in all_raw %}
+                    <option value="{{ a_raw.name }}">
+                {% endfor %}
+            </datalist>
+            <br>
+            <input type="submit" class="btn btn-info" value='Delete'/>
+        </div>
+    </form>
    
-{% endblock %}
+{% endblock %} 

@@ -64,20 +64,21 @@
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto"> 
+        <div class="collapse navbar-collapse" id="main_nav">
+          <ul class="navbar-nav"> 
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:demand_list_url' %}">History</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:items_list_url' %}">Raw materials</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">Add-records</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:calculations_url' %}">Analysis</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Charts</a></li>
             <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Product</a>
-              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <a class="dropdown-item" href="{% url 'goods:goods_form_url' %}">Add</a>
-                <a class="dropdown-item" href="{% url 'goods:amount_form_url' %}">Details form</a>
-                <a class="dropdown-item" href="{% url 'goods:delete_goods_url' %}">Delete</a>
-              </div>
-            </li>
+              <ul class="dropdown-menu">
+                  <li><a class="dropdown-item" href="{% url 'goods:goods_form_url' %}">New product</a></li>
+                  <li><a class="dropdown-item" href="#">Add raw material for existing product</a></li>
+                  <li><a class="dropdown-item" href="{% url 'goods:amount_form_url' %}">Details form</a></li>
+                  <li><a class="dropdown-item" href="{% url 'goods:delete_goods_url' %}">Delete</a></li>
+              </ul>   
+            </li>    
             <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">upload</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="{% url 'csvs:upload_view_product_url' %}">Raw materials</a>

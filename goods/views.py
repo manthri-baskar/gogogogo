@@ -2,8 +2,9 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages 
+#from products.models import Product
 from .forms import *
- 
+from .models import *
 # Create your views here.
 
 @login_required(login_url='login')
@@ -12,7 +13,7 @@ def goods_form_view(request):
     if request.method == 'POST':
         form=GoodsForm(request.user, request.POST) 
         if form.is_valid():
-            a = form.cleaned_data["good_name"]
+            a = form.cleaned_data["good_name"] 
             b = form.cleaned_data["setup_cost"]
             c = form.cleaned_data["production_cost"]
             d = form.cleaned_data["holding_cost"]
@@ -56,6 +57,28 @@ def amount_form_view(request):
  
 @login_required(login_url='login')
 def delete_goods(request):
-    query_set = Goods.objects.get(id=pk)
+    all_goods = Goods.objects.all().filter(user=request.user)
+    all_raw   = Product.objects.all().filter(user=request.user)
+
+    if request.method == 'POST':
+        action   = request.POST.get('action')
+        del_good = request.POST.get('good')
+        del_raw  = request.POST.get('raw_mat')
+            
+        dele_good  = Goods.objects.get(good_name=del_good, user=request.user)
+        dele_raw   = Product.objects.get(name=del_raw, user=request.user)
+        #dele_raw   = dele_raw.id
+        
+        if action == 'good_name':
+            dele_good.delete()
+        if action == 'raw_material':
+            dele_raw.delete()
+        if action == 'good_raw':
+            dele_good.raw_material.remove(dele_raw)
+
+    context = {
+        'all_goods' : all_goods,
+        'all_raw'   : all_raw
+    }
     
-    return render(request,'goods/delete_goods.html',context)
+    return render(request,'goods/delete_goods.html', context)
