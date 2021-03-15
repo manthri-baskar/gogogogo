@@ -35,18 +35,17 @@ def get_simple_plot(chart_type, *args, **kwargs):
     x   = kwargs.get('x')
     y   = kwargs.get('y')
     data = kwargs.get('data')
-    if chart_type =='bar plot':
+    if chart_type =='bar':
         title = 'demand per day'
         plt.title(title)
         plt.bar(x, y)
-    elif chart_type =='line plot':
+    elif chart_type =='line':
         title = 'demand per day'
         plt.title(title)
         plt.plot(x, y)
     else:
         title = 'Number of times product got sold'
         plt.title(title)
-        print(data)
         sns.countplot('name', data=data)
 
     plt.xticks(rotation=90)

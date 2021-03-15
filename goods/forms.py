@@ -18,4 +18,4 @@ class GoodsForm(forms.ModelForm):
     def __init__(self,user=None,*args,**kwargs):
         super(GoodsForm,self).__init__(*args,**kwargs)
         if user:
-            self.fields['raw_material'].queryset=Product.objects.filter(user=user)
+            self.fields['raw_material'].queryset=Product.objects.filter(user=user) 

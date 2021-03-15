@@ -1,18 +1,13 @@
-{% extends 'base1.html'%}
+{% extends 'base.html'%}
+{% load crispy_forms_tags %}
 
 {% block title %} add purchase{% endblock title %}
 
 {% block content %}
-    {% if added_message %}
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">{{ added_message }}</div>
-        </div>    
-    {% endif %}
     <h1>Add</h1>
-    <form action="" method="POST" class="ui form">
+    <form action="" method="post">
         {% csrf_token %}
-        {{ form }}
-        <button type='submit' class="ui positive button block-center mtop">Add sales</button>
+        {{ form|crispy }}
+        <button type="submit" class="btn btn-primary">Submit</button>
     </form>
-{% endblock content%}
+{% endblock %}

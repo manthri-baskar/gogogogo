@@ -58,44 +58,49 @@
         </div>
         <span class="hello-msg">Welcome, {{request.user}}</span>
         <span ><a  class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
-      </nav-->
+      </nav--> 
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Company</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
+          <ul class="navbar-nav mr-auto"> 
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:demand_list_url' %}">History</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:items_list_url' %}">Raw materials</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">Add-records</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:calculations_url' %}">Analysis</a></li>
-            <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Upload & Analysis</a></li>
+            <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Charts</a></li>
             <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Product</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="{% url 'goods:goods_form_url' %}">Add</a>
-                <a class="dropdown-item" href="#">Another action</a>
                 <a class="dropdown-item" href="{% url 'goods:amount_form_url' %}">Details form</a>
                 <a class="dropdown-item" href="{% url 'goods:delete_goods_url' %}">Delete</a>
+              </div>
+            </li>
+            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">upload</a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <a class="dropdown-item" href="{% url 'csvs:upload_view_product_url' %}">Raw materials</a>
+                <a class="dropdown-item" href="{% url 'csvs:upload_view_url' %}">Raw material usage</a>
               </div>
             </li>
             <!--li class="nav-item"><a class="nav-link disabled" href="#">Disabled</a></li-->
           </ul>
         </div>
-        <span class="hello-msg">Welcome {{request.user}}</span>
-        <span><a class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
+        <span style="color: darkblue;" class="hello-msg">Welcome {{request.user}}</span>
+        <span ><a style="color: red;" class="hello-msg" href="{% url 'logout' %}">Logout</a></span>
       </nav>
       {% endif %}
 
       <div class="container mt-5">
         <div class="row">
-          <div class="col-8 offset-md-2">
+          <!--div class="col-8 offset-md-2"-->
             <div class="ui container">
               {% block content %}
                 
               {%  endblock %}
             </div>
-          </div>
+          <!--/div-->
         </div>
       </div>
       <!-- Optional JavaScript -->

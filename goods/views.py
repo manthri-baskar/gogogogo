@@ -53,7 +53,7 @@ def amount_form_view(request):
 
     return render(request,'goods/add_amount.html', context={'all_goods':all_goods, 'all_Amount':all_Amount})
 
-
+ 
 @login_required(login_url='login')
 def delete_goods(request):
     query_set = Goods.objects.get(id=pk)

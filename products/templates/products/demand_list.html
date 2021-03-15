@@ -16,7 +16,7 @@
     {% for d in posts %}
     <tbody>
       <tr>
-        <th scope="row">{{ d.product }}</th>
+        <th scope="row">{{ d.product.name }}</th>
         <td>{{ d.price }}</td>
         <td>{{d.quantity}}</td>
         <td>{{d.date}}</td>

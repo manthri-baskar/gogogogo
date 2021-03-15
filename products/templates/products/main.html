@@ -1,78 +1,72 @@
-{% extends 'base1.html'%}
+{% extends 'base.html'%}
 
-{% block title %}chart{% endblock title %}
+{% block title %}chart{% endblock title %} 
 
 {% block content %} 
-    <div class="ui modal mymodal">
-        <div class="header"><h1>Demand</h1></div>
-        <div class="ui container">
-            <ul>
-                <li><strong>Count: </strong>{{ Quantity.count}}</li>
-                <li><strong>Mean: </strong>{{ Quantity.mean}}</li>
-                <li><strong>Std dev: </strong>{{ Quantity.std|floatformat}}</li>
-            </ul>
-        </div>
-    </div>
     <div>
-        <div class="block-center">
-            {% if error_message %}
-                <!--linked with java script code in main.js-->
-                <div class="ui negative message">
-                    <i class="close icon"></i>
-                    <div class="header">{{ error_message }}</div>
-                </div>
-            {% endif %}
+        <div class="">
 
             {% if request.POST %}
                 {% if graph %}
                     <img src="data:image/png;base64, {{ graph | safe}}">
                 {% endif %}
             {% endif %}
+
         </div>
-        <form action="" method="POST" class="ui form">
-            {% csrf_token %}
-            <div class="field">
-                <label>Choose a chart type: </label>
-                <div class="ui selection dropdown">
-                    <input type="hidden" name="plot">
-                    <i class="dropdown icon"></i>
-                    <div class="default text">----</div>
-                    <div class="menu">
-                        <div class="item" value="bar">Bar plot</div>
-                        <div class="item" value="line">Line plot</div>
-                        <div class="item" value="count">Count plot</div>
+        <form action="" method="POST">
+            {% csrf_token %}                
+            <div class="card">
+                <div class="card-header">Chart</div>
+                <div class="card-body">  
+                    <div class="form-group">
+                        <label for="inputState">Choose a chart type:</label>
+                        <select id="inputState" name="plot" class="form-control">
+                            <option selected>---------</option>
+                            <option value="bar">bar plot</option>
+                            <option value="line">line plot</option>
+                            <option value="count">count plot</option>
+                        </select>
                     </div>
+
+                    <div class="form-group">
+                        <label>Raw material:</label><br>
+                        <input type="text" name="item" class="col-md-10">
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label>Date from:</label>
+                            <input type="date" name="date_from">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label>Date to:</label>
+                            <input type="date" name="date_to">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Submit</button>
                 </div>
-            </div>
-            <div class="field">
-                <label>Item: </label>
-                <input type="text" name="item">
-            </div>
-            <div class="field">
-                <div class="two fields">
-                    <div class="field">
-                        <label>Date from: </label>
-                        <input type="date" name="date_from">
-                    </div>
-                    <div class="field">
-                        <label>Date to: </label>
-                        <input type="date" name="date_to">
-                    </div>
+            </div><br>
+                        
+            {% if error_message %}          
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{ error_message }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-            </div>
-            <div class="block-center">
-                <button class='ui primary button' type="submit">Select</button>
-            </div>
+            {% endif %}
         </form>
-        <div class="block-center">
-            <button class='ui secondary button' id='modal-btn'>See summary</button>
-            <br><br>
-        </div>
-        <div>
-            <h2><u>Items:</u></h2>
-            {% for a in items %}
-                {{a}}<br>
-            {% endfor %}
-        </div>
+        <br>
+        <div class="card">
+            <div class="card-header">Raw materials</div>
+            <div class="card-body"> 
+                <div>
+                    {% for a in items %}
+                        {{a.name}}<br>
+                    {% endfor %}
+                </div>
+            </div>
+        </div><br>
     </div>
 {% endblock content %}

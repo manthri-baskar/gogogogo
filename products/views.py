@@ -40,7 +40,7 @@ def chart_select_view(request):
         if request.method == 'POST':
             chart_type = request.POST.get('plot')
             date_from  = request.POST.get('date_from') 
-            date_to    = request.POST.get('date_to')
+            date_to    = request.POST.get('date_to') 
             item       = request.POST.get('item')
             
             df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
@@ -83,7 +83,7 @@ def add_purchase_view(request):
                 n = form.cleaned_data["product"]
                 l = form.cleaned_data["quantity"]
                 c = form.cleaned_data["price"]
-                o = form.cleaned_data["recieved"]
+                o = form.cleaned_data["recieved"] 
                 d = form.cleaned_data["date"]
 
                 reporter = request.user.items.get(name=n, user=request.user)

@@ -35,7 +35,7 @@ class Amount(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="amount")
     goods           = models.ForeignKey(Goods, on_delete=models.CASCADE)
     raw_mate        = models.ForeignKey(Product, on_delete=models.CASCADE)
-    required_amount = models.FloatField(validators=[validate_positive])
+    required_amount = models.FloatField(validators=[validate_positive]) 
 
     # To have unique pairs of goods and raw_material 
     class Meta:
