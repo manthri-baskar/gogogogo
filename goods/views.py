@@ -28,9 +28,9 @@ def goods_form_view(request):
 
             t = Goods(good_name=a, setup_cost=b, production_cost=c, holding_cost=d, production_rate=e, production_quantity=f, total_demand=h)
             t.save()
-            for raw_mate in g:
-                z = Product.objects.get(name=raw_mate)
-                t.raw_material.add(z.id, through_defaults={'required_amount': 0})
+            for raw in g:
+                z = Product.objects.get(name=raw.name, user=request.user)
+                t.raw_material.add(z.id, through_defaults={'user':request.user,'required_amount': 0})
 
             request.user.good.add(t)
             
@@ -41,29 +41,21 @@ def goods_form_view(request):
 @login_required(login_url='login')
 def amount_form_view(request):
     all_goods  = Goods.objects.all().filter(user=request.user)
-    all_Amount = Amount.objects.all()
+    all_Amount = Amount.objects.all().filter(user=request.user)
     if request.method == "POST":
         for a_good in all_goods:
             for a_raw in a_good.raw_material.all():
                 x = str(a_good.good_name)+' -> '+str(a_raw)
                 req_amount = request.POST.get(x)
                 a_good.raw_material.remove(a_raw)
-                t = Amount(goods=a_good, raw_mate=a_raw, required_amount= req_amount)
+                t = Amount(user=request.user, goods=a_good, raw_mate=a_raw, required_amount= req_amount)
                 t.save()
 
     return render(request,'goods/add_amount.html', context={'all_goods':all_goods, 'all_Amount':all_Amount})
 
 
 @login_required(login_url='login')
-def delete_goods(request,pk):
+def delete_goods(request):
     query_set = Goods.objects.get(id=pk)
     
-    if request.method =='POST':
-        query_set.delete()
-        messages.success(request,query_set.good_name + ' Removed')
-        return redirect('goods:goods_form_url')
-    
-    context={
-        'good':query_set.good_name
-        }
     return render(request,'goods/delete_goods.html',context)

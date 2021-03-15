@@ -24,3 +24,7 @@ ul li {
 .mtop{
     margin-top: 10px !important;
 }
+
+.selector-for-some-widget {
+    box-sizing: content-box;
+  }

@@ -24,7 +24,7 @@ class Goods(models.Model):
     raw_material        = models.ManyToManyField(Product, through='Amount')
 
     def __str__(self):
-        return self.good_name
+        return '{} => {}'.format(self.user, self.good_name)
 
     def save(self, *args, **kwargs):
         self.good_name = self.good_name.upper()
@@ -32,6 +32,7 @@ class Goods(models.Model):
 
 
 class Amount(models.Model):
+    user            = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="amount")
     goods           = models.ForeignKey(Goods, on_delete=models.CASCADE)
     raw_mate        = models.ForeignKey(Product, on_delete=models.CASCADE)
     required_amount = models.FloatField(validators=[validate_positive])
@@ -41,4 +42,4 @@ class Amount(models.Model):
         unique_together = [['goods', 'raw_mate']]
 
     def __str__(self):
-        return '{} - {}'.format(self.goods,self.raw_mate)
+        return '{} - {}'.format(self.goods, self.raw_mate.name)

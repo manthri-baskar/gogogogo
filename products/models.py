@@ -41,7 +41,7 @@ class Product(models.Model):
     z                    = models.DecimalField(max_digits=4,decimal_places=3,default='0',blank=True,null=True)
 
     def __str__(self):
-        return str(self.name)
+        return '{} => {}'.format(self.user, self.name)
     
     def save(self, *args, **kwargs):
         self.name = self.name.upper()
@@ -67,5 +67,5 @@ class Purchase(models.Model):
         super().save(*args, **kwargs)
 
     def __str__(self):
-        return "sold {} - {} items for {}".format(self.product.name, self.quantity, self.total_price)
+        return "{} sold at {} each".format(self.product, self.price)
 

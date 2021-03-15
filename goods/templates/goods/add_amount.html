@@ -2,7 +2,7 @@
 {% block title %} add purchase{% endblock title %}
 
 {% block content %}
-    <h3 style="color:rgb(7, 4, 218);"><u>Enter amount of each raw material required for each good</u></h3>
+    <h4 style="color:rgb(117, 117, 173);"><u>Enter amount of each raw material required for each good</u></h4>
     <br>
     
     <form method='POST' action="{% url 'goods:amount_form_url' %}" class="">
@@ -12,13 +12,13 @@
             <h5><u>{{a_good.good_name}}</u>:</h5>
             {% if a_good.raw_material.all %}
                 {% for a_raw in a_good.raw_material.all %}
-                    <label for="colFormLabel" class="col-sm-6 col-form-label">{{a_raw}}</label>
+                    <label for="colFormLabel" class="col-sm-8 col-form-label">{{a_raw}}</label>
                     {% for an_amount in all_Amount %}
                         {% if an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount == 0%}
-                            <input value="" type="number" class="col-sm-2" placeholder="" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
+                            <input value="" type="number" class="col-sm-2" placeholder="units/unit of goods" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
                             {{break}}
                         {% elif an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount != 0%}
-                            <input value="{{an_amount.required_amount}}" type="number" class="col-sm-2" placeholder="" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
+                            <input value="{{an_amount.required_amount}}" type="number" class="col-sm-2" placeholder="units/unit of goods" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
                             {{break}}
                         {% endif %}
                     {% endfor %}                    

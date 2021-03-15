@@ -181,7 +181,7 @@ def delete_items(request,pk):
         query_set.delete()
         messages.success(request,query_set.name + ' Removed')
         return redirect('products:items_list_url')
-    
+     
     context={
         'item':query_set.name
         }
