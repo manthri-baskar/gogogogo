@@ -2,9 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages 
-#from products.models import Product
 from .forms import *
 from .models import *
+import datetime
+import math
+import scipy.stats as st
 # Create your views here.
 
 @login_required(login_url='login')
@@ -82,3 +84,40 @@ def delete_goods(request):
     }
     
     return render(request,'goods/delete_goods.html', context)
+
+
+@login_required(login_url='login')
+def add_rawTo_good(request):    
+    all_goods = Goods.objects.all().filter(user=request.user)
+    
+    if request.method == 'POST':
+        goodname         = request.POST.get('goodname')
+        name             = request.POST.get('name')
+        lead_time        = request.POST.get('lead_time')
+        std              = request.POST.get('std')
+        carry            = request.POST.get('carry_cost')
+        order            = request.POST.get('order_cost')
+        unit_cost        = request.POST.get('unit_cost')
+        demand           = request.POST.get('avg_daily_demand')
+        total_inventory  = request.POST.get('total_inventory')
+
+        a = 2*300*float(demand)*float(order)
+        b = float(unit_cost)*float(carry)/100
+        eoq  = math.sqrt(a/b)
+        z    = (st.norm.ppf(90/100))
+        rq   = float(lead_time)*float(demand)+float(z)*float(std)*float(lead_time)
+       
+        good  = Goods.objects.get(good_name=goodname, user=request.user)
+        raw_to_good = good.raw_material.create(user=request.user, date=datetime.date.today(), 
+        name=name, lead_time=lead_time, standard_deviation=std, service_level=90, 
+        no_of_workingdays=300, carrying_cost= carry, ordering_cost=order, 
+        unit_costprice=unit_cost, average_daily_demand=demand, total_inventory=total_inventory, 
+        eoq=eoq, rq=rq, z=z,  through_defaults={'user':request.user,'required_amount': 0})
+        
+        return redirect('goods:amount_form_url')
+
+    context = {
+        'all_goods' : all_goods,
+    }
+
+    return render(request,'goods/rawTo_good.html', context)

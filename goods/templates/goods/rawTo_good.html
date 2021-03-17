@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<form action="{% url 'goods:add_rawTo_good_url' %}" method="POST" class="">
+    {% csrf_token %}  
+    <div class="card">
+        <div class="card-header">Create and add raw material to a particular good</div>
+        <div class="card-body">
+            <div class="form-group row">
+                <br>
+                    <label for="exampleDataList" class="col-sm-4 col-form-label">Good:</label>
+                    <div class="col-sm-10"><input class="form-control" list="goods" id="exampleDataList" placeholder="enter Good name" type="text" name="goodname"></div>
+                    <datalist id="goods">
+                        {% for a_good in all_goods %}
+                            <option value="{{ a_good.good_name }}">
+                        {% endfor %}
+                    </datalist>
+                <br>
+            </div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">Raw material:        </label><div class="col-sm-6"><input type="text"   class="form-control" name="name"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">Average daily demand:</label><div class="col-sm-6"><input type="number" class="form-control" name="avg_daily_demand"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">standard deviation:  </label><div class="col-sm-6"><input type="number" class="form-control" name="std"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">unit cost:           </label><div class="col-sm-6"><input type="number" class="form-control" name="unit_cost"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">ordering cost:       </label><div class="col-sm-6"><input type="number" class="form-control" name="order_cost"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">carrying cost:       </label><div class="col-sm-6"><input type="number" class="form-control" name="carry_cost"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">lead time:           </label><div class="col-sm-6"><input type="number" class="form-control" name="lead_time"></div></div>
+            <div class="form-group row"><label class="col-sm-4 col-form-label">Total inventory:     </label><div class="col-sm-6"><input type="number" class="form-control" name="total_inventory"></div></div>
+            <br>
+
+            <input type="submit" class="btn btn-info" value='create'/>
+        </div>
+    </div>
+</form><br>
+   
+{% endblock %} 

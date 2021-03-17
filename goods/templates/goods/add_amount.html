@@ -6,7 +6,7 @@
         {% csrf_token %}
                         
         <div class="card">
-            <div class="card-header">Enter amount of each raw material required for each good</div>
+            <div class="card-header">Enter number of units of each raw material required for one unit of each good</div>
             <div class="card-body"> 
                 {% for a_good in all_goods %}
                     <h5>{{a_good.good_name}}:</h5>
