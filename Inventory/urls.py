@@ -20,6 +20,7 @@ from django.conf.urls.static import static
 from register import views as v
 
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("register/", v.register, name="register"),

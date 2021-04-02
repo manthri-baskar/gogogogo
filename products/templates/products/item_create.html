@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 {% load crispy_forms_tags %}
 
+
+{% block scripts %}<link rel="stylesheet"href="/static/css/base.css">{% endblock %}
+
 {% block content %}
     <h1>Create Item</h1>
     {% if product_message %}

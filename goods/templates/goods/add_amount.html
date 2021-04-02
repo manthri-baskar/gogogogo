@@ -1,15 +1,34 @@
 {% extends 'base.html' %}
 {% block title %} add purchase{% endblock title %}
 
+
 {% block content %}  
     <form method='POST' action="{% url 'goods:amount_form_url' %}" class="">
         {% csrf_token %}
                         
         <div class="card">
-            <div class="card-header">Enter number of units of each raw material required for one unit of each good</div>
+            
+            <div class="card-header">Enter number of units of each raw material required for one unit of each good <a id="AddForGoods" class="btn btn-info"" href="{% url 'goods:goods_form_url' %}">Add new good</a><a id='DeleteForGoods' class="btn btn-danger" href="{% url 'goods:delete_goods_url' %}">Delete</a> </div>
             <div class="card-body"> 
                 {% for a_good in all_goods %}
+                <div class="container">
+                    <div class="row">
+                        <div class="col-sm" >
                     <h5>{{a_good.good_name}}:</h5>
+                </div>
+                <div class="col-sm" >
+                    <button class="btn btn-outline-secondary" onclick="myFunction()">Raw materials</button>
+                </div>
+                <div class="col-sm" >
+                    <a href="{% url 'goods:update_item_url' a_good.id %}" class="btn btn-outline-secondary" role="button">Add existing Raw Material</a>
+                </div>
+                <div class="col-sm" >
+                    <a href="{% url 'goods:add_rawTo_good_url' a_good.id %}" class="btn btn-outline-secondary" role="button">Add New Raw Material</a>
+                </div>
+                    </div>
+                    </div>
+                    <br>
+
                     {% if a_good.raw_material.all %}
                         {% for a_raw in a_good.raw_material.all %}
                             <label for="colFormLabel" class="col-sm-8 col-form-label">{{a_raw.name}}</label>
@@ -21,12 +40,15 @@
                                     <input value="{{an_amount.required_amount}}" type="number" class="col-sm-2" placeholder="units/unit of goods" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
                                     {{break}}
                                 {% endif %}
-                            {% endfor %}                    
+                            {% endfor %}                     
                         {% endfor %}
-                        <br>
+                        
                     {% else %}
                         <h5 style="color:darkcyan;">no raw materials are entered for this good...</h5><br>
                     {% endif %}
+                    <hr>
+
+
                 {% endfor %}
 
                 <input type="submit" class="btn btn-info" value='save'/>

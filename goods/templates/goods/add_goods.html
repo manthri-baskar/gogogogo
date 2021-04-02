@@ -1,25 +1,52 @@
 {% extends 'base.html' %}
+{% load static %}
 {% load crispy_forms_tags %}
 
+{% block scripts %}
+<script type="text/javascript" src="/static/js/goods.js"></script>
+<link rel="stylesheet" src='/static/css/base.css'>
+{% endblock %}
+
+
+{% if product_message %}
+    <div class="ui success message">
+        <i class="close icon"></i>
+        <div class="header">{{ product_message }}</div>
+    </div>
+{% endif %}
+<br>
+<br>
+{% for message in messages %}
+    <div class="alert alert-danger" role="alert">
+    {{message}}
+    </div>
+{%endfor%}
+
 {% block content %}
-    <h1>Create goods</h1>
-    {% if product_message %}
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">{{ product_message }}</div>
+<div id="repeat" style="display: none">
+    <div class="row" >
+        <div class="col">
+            <input class="form-control" list="datalistOptions" id="raw" type="text" name="raw_material1" placeholder='Raw Material 1'>
+            <datalist id="datalistOptions">
+                {% for an_item in items %}
+                    <option value="{{ an_item.name }}">
+                {% endfor %}
+            </datalist><br>
         </div>
-    {% endif %}
-    <br>
-    <br>
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">
-          {{message}}
-        </div>
-    {%endfor%}
-    <form method='POST' action=''>
-        {% csrf_token %}
-        {{form|crispy}}
-        <input type="submit" class="btn btn-info" value='Create'/>
-        
-    </form>
-{% endblock %} 
+        <div class="col"><input type="number" class="form-control" id="req" name="required_amount1" placeholder='Required Amount'min="1" required></div>  
+        <input class="btn btn-danger" type="button" id='remove_btn' value="Remove" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">  
+        <div class="col"></div>
+    </div> 
+</div>
+
+<h1>Create goods</h1>
+<form method='POST' action='' id="our-div" >
+    {% csrf_token %}
+    {{form1|crispy}}
+    <label for="">Raw Materials: </label>
+    <input type="button" id="moreFields" value="+" />
+    <span id="writeroot"></span><br>
+    <input type="submit" class="btn btn-info" value='Create' id="our-paragraph"/>
+</form>
+
+{% endblock %}

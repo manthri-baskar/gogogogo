@@ -2,11 +2,8 @@
 <!doctype html>
 <html lang="en">
   <head>
-    <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    
-    <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
     <link rel="stylesheet" type="text/css" href = "c:/Users/Dell/Desktop/Inventory project/static_project/style.css">
     
@@ -14,17 +11,43 @@
       {% block title %}
         Inventory Project
       {% endblock %}
-    </title>
+      
+    </title> 
+
+    
   </head>
-  <body>
-    <style>
+  <body> 
+    <style>  
       .hello-msg{
         font-size: 18px;
         color: #fff;
         margin-right: 20px;
       }
-    </style>
+      #remove_btn {
+    font-size: 15px;
+    padding: 0px;
+    height: 38px;
+    text-align: center;
+      }
+       #moreFields{
+         padding: 0px;
+         color:white;
+         border: 2px solid white;
+         width: 200px;
+         background-color:rgb(9, 160, 187);
+         border-radius: 8px;
+         margin-left: 40px;
+         margin-right: 40px;
+         margin-bottom: 40px;
+    }
+    #DeleteForGoods{
+      margin-left: 80px;
+    }
+    #AddForGoods{
+      margin-left: 180px;
+    }
 
+    </style>
     {% if user.is_authenticated %}
       <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <a class="navbar-brand" href="#">Company</a>
@@ -38,21 +61,18 @@
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:add-purchase-view' %}">Add-records</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:calculations_url' %}">Analysis</a></li>
             <li class="nav-item active"><a class="nav-link" href="{% url 'products:main-products-view' %}">Charts</a></li>
-            <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Product</a>
-              <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="{% url 'goods:goods_form_url' %}">New product</a></li>
-                  <li><a class="dropdown-item" href="{% url 'goods:add_rawTo_good_url' %}">Add raw material for existing product</a></li>
-                  <li><a class="dropdown-item" href="{% url 'goods:amount_form_url' %}">Details form</a></li>
-                  <li><a class="dropdown-item" href="{% url 'goods:delete_goods_url' %}">Delete</a></li>
-              </ul>   
-            </li>    
+            <li class="nav-item active"><a class="nav-link" href="{% url 'goods:amount_form_url' %}">Goods details</a></li>
+            <!--<li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Product</a>
+              <ul class="dropdown-menu">    
+                  <li><a class="dropdown-item" href="{% url 'goods:amount_form_url' %}">Details form</a></li>    
+              </ul>  
+            </li>  -->  
             <li class="nav-item dropdown"><a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">upload</a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <a class="dropdown-item" href="{% url 'csvs:upload_view_product_url' %}">Raw materials</a>
                 <a class="dropdown-item" href="{% url 'csvs:upload_view_url' %}">Raw material usage</a>
               </div>
             </li>
-            <!--li class="nav-item"><a class="nav-link disabled" href="#">Disabled</a></li-->
           </ul>
         </div>
         <span style="color: darkblue;" class="hello-msg">Welcome {{request.user}}</span>
@@ -62,20 +82,18 @@
 
       <div class="container mt-5">
         <div class="row">
-          <!--div class="col-8 offset-md-2"-->
             <div class="ui container">
               {% block content %}
                 
               {%  endblock %}
             </div>
-          <!--/div-->
         </div>
       </div>
-      <!-- Optional JavaScript -->
-      <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
       <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
-</body>
+      {% block scripts %}{% endblock %}
+    </body>
 </html>
 
