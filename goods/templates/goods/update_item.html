@@ -1,10 +1,8 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load crispy_forms_tags %}
 
 {% block scripts %}
     <script type="text/javascript">
-
         document.getElementById("moreFields").addEventListener("click", moreFields);
         var name1 = document.getElementById("mohan")
         //var name2 = document.getElementById("mohan1")
@@ -33,89 +31,42 @@
 {% endblock %}
 
 {% block content %}
-
-<div id="repeat" style="display: none">
-    <div class="row" >
-        <div class="col">
-            <input class="form-control" list="datalistOptions" id="raw" type="text" name="raw_material{{length}}" placeholder='Raw Material {{length}}'>
-            <datalist id="datalistOptions">
-                {% for an_item in items %}
-                    <option value="{{ an_item.name }}">
-                {% endfor %}
-            </datalist><br>
-        </div>
-        <div class="col"><input type="number" class="form-control" id="req" name="required_amount{{length}}" placeholder='Required Amount' min="1" required></div>  
-        <input class="btn btn-danger" type="button" id='remove_btn' value="Remove" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">  
-        <div class="col"></div>
-    </div>
-</div>
-
-    <h1>Update good</h1>
-    <form method='POST' action='' id="our-div" >
-        {% csrf_token %}
-
-        <label for="">Raw Materials: </label>
-        <input type="button" id = "moreFields" value="+" />
-        <span id="writeroot"></span><br>
-        <span id="mohan" name="{{length}}"></span>
-        <input type="submit" class="btn btn-info" value='Create' id="our-paragraph"/>
-    </form>
-    {% endblock %}
-<!--
-        <h5>{{a_good.good_name}}:</h5>
-
-        {% if a_good.raw_material.all %}
-
-            {% for a_raw in a_good.raw_material.all %}
-            <div class="container">
-                <div class="row">
-            <div class="col-sm" >
-                <label for="colFormLabel" >{{a_raw.name}}</label>
+    <div id="repeat" style="display: none">
+        <div class="row" >
+            <div class="col">
+                <input class="form-control" list="datalistOptions" id="raw" type="text" name="raw_material{{length}}" placeholder='Raw Material {{length}}'>
+                <datalist id="datalistOptions">
+                    {% for an_item in items %}
+                        <option value="{{ an_item.name }}">
+                    {% endfor %}
+                </datalist><br>
             </div>
-            <div class="col-sm" >
-                {% for an_amount in all_amount %}
-                    {% if an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount == 0%}
-                        <input value="" type="number"  placeholder="units/unit of goods" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
-                        {{break}}
-                    {% elif an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount != 0%}
-                        <input value="{{an_amount.required_amount}}" type="number"  placeholder="units/unit of goods" name="{{a_good.good_name}} -> {{a_raw}}" required><br>
-                        {{break}}
-                    {% endif %}
-                {% endfor %}  
-            </div>
-            <div class="col-sm" >
-            <input  class="btn btn-danger" type="button" id='remove_btn' value="Remove" onclick="this.parentNode.parentNode.removeChild(this.parentNode);"></span>  
-            </div>
- 
+            <div class="col"><input type="number" class="form-control" id="req" name="required_amount{{length}}" placeholder='Required Amount' min="1" required></div>  
+            <input class="btn btn-danger" type="button" id='remove_btn' value="Remove" onclick="this.parentNode.parentNode.removeChild(this.parentNode);">  
+            <div class="col"></div>
         </div>
     </div>
-    <br>                 
+
+    <div class="card">
+        <div class="card-header">Add existing rawmaterial to the <strong>{{a_good.good_name}}</strong></div>
+        <div class="card-body"> 
+            <form method='POST' action='' id="our-div" >
+                {% csrf_token %}
+                <label for="">Raw Materials: </label>
+                <input type="button" id = "moreFields" value="+" />
+                <span id="writeroot"></span><br>
+                <span id="mohan" name="{{length}}"></span>
+                <input type="submit" class="btn btn-info" value='Create' id="our-paragraph"/>
+            </form>
+        </div>
+    </div>
+    <br>
+    <div class="card">
+        <div class="card-header">Rawmaterial added to <strong>{{a_good.good_name}}</strong></div>
+        <div class="card-body"> 
+            {% for a_amount in all_amount %}
+                {{a_amount.raw_mate.name}}<br>
             {% endfor %}
-
-
-            <br>
-        {% else %}
-            <h5 style="color:darkcyan;">no raw materials are entered for this good...</h5><br>
-
-        {% endif %}
-
--->
-    
-
-
-
-    <!--  
-    {% if product_message %}
-        <div class="ui success message">
-            <i class="close icon"></i>
-            <div class="header">{{ product_message }}</div>
         </div>
-    {% endif %}
-    <br>
-    <br>
-    {% for message in messages %}
-        <div class="alert alert-danger" role="alert">
-        {{message}}
-        </div>
-    {%endfor%}
-    -->
+    </div>
+{% endblock %}  

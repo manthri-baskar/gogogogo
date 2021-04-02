@@ -139,40 +139,83 @@ def add_rawTo_good(request,pk):
 
 @login_required(login_url='login')
 def update_items(request,pk):
+    all_goods   = Goods.objects.all().filter(user=request.user)
+    all_Amount  = Amount.objects.all().filter(user=request.user)
     par_good    = Goods.objects.get(id=pk)
     all_raw     = Product.objects.all().filter(user=request.user)
-    all_amount  = Amount.objects.all().filter(user=request.user, goods=par_good)    
+    good_amount = Amount.objects.all().filter(user=request.user, goods=par_good)    
     length      = par_good.raw_material.all().filter(user=request.user).count()
     prod_length = Product.objects.all().filter(user=request.user).count()
-    form        = GoodsForm(instance=par_good)
-    n           = par_good.good_name
     rawmate     = par_good.raw_material.all()
-
-    
+    error_message     = None
+    success_message = None
+   
     length = length+1
     if request.method=='POST':
+        for y in range(prod_length):
+            x   = 'raw_material'+str(y)
+            ram = 'required_amount'+str(y)
+            if request.POST.get(x) and request.POST.get(ram) :
+                g = request.POST.get(x)
+                k = request.POST.get(ram)
+                z = Product.objects.get(name=g,user=request.user)
+                try: 
+                    b = par_good.raw_material.get(user=request.user, name=g)
+                    if error_message == None:
+                        error_message = g +' is already added to '+ par_good.good_name
+                    else:
+                        error_message = g +', '+ error_message
+                except:
+                    if success_message == None:
+                        success_message = g +' is added to '+ par_good.good_name
+                    else:
+                        success_message = g +', '+ success_message
 
-            for y in range(prod_length):
-                x   = 'raw_material'+str(y)
-                ram = 'required_amount'+str(y)
-                if request.POST.get(x) and request.POST.get(ram) :
-                    g = request.POST.get(x)
-                    k = request.POST.get(ram)
-                    z = Product.objects.get(name=g,user=request.user)
-                    par_good.raw_material.add(z.id, through_defaults={'required_amount': k , 'user' : request.user})
-
-
-
-
-            #messages.info(request, n + '  Updated to ' + par_good.good_name)
-            return redirect('goods:amount_form_url')
+                par_good.raw_material.add(z.id, through_defaults={'required_amount': k , 'user' : request.user})
+        context={
+            'error_message'   :error_message,
+            'success_message' :success_message,
+            'all_goods'       :all_goods, 
+            'all_Amount'      :all_Amount
+        }
+        return render(request,'goods/add_amount.html',context)
     
     context={
-        'form'     :form,
-        'rawmate'  :rawmate,
-        'items'    :all_raw,
-        'a_good' :par_good,
-        'all_amount' :all_amount,
-        'length'   :length
+        'rawmate'    :rawmate,
+        'items'      :all_raw,
+        'a_good'     :par_good,
+        'all_amount' :good_amount,
+        'length'     :length,
     }
     return render(request,'goods/update_item.html',context)
+
+@login_required(login_url='login')
+def remove_raw_from_good(request,pk,pk2):
+    PK  = Goods.objects.get(user=request.user,id=pk)
+    PK2 = Product.objects.get(user=request.user,id=pk2)
+    PK.raw_material.remove(PK2)
+    all_goods   = Goods.objects.all().filter(user=request.user)
+    all_Amount  = Amount.objects.all().filter(user=request.user)
+    success_message = PK2.name + ' is removed from '+ PK.good_name
+
+    context={
+            'all_goods'       :all_goods, 
+            'all_Amount'      :all_Amount,
+            'success_message' :success_message
+        }
+    return render(request,'goods/add_amount.html',context)
+
+@login_required(login_url='login')
+def delete_good(request,pk):
+    PK  = Goods.objects.get(user=request.user,id=pk)
+    PK.delete()
+    all_goods   = Goods.objects.all().filter(user=request.user)
+    all_Amount  = Amount.objects.all().filter(user=request.user)
+    success_message = PK.good_name + ' is deleted '
+
+    context={
+            'all_goods'       :all_goods, 
+            'all_Amount'      :all_Amount,
+            'success_message' :success_message
+        }
+    return render(request,'goods/add_amount.html',context)

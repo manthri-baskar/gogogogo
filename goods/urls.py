@@ -9,4 +9,6 @@ urlpatterns = [
     path('delete_items/', delete_goods, name="delete_goods_url"),
     path('raw_to_good/<str:pk>/', add_rawTo_good, name="add_rawTo_good_url"),
     path('update_item/<str:pk>/',update_items,name="update_item_url"),  
-] 
+    path('delete3/<str:pk>/<str:pk2>',remove_raw_from_good,name="remove_rawfromgood_url"),  
+    path('delete_good/<str:pk>/',delete_good,name="delete_good_url"),  
+]
