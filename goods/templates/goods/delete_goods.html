@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <br>
     <form action="{% url 'goods:delete_goods_url' %}" method="POST" class="">
         {% csrf_token %}  
         <div class="card">

@@ -1,66 +1,81 @@
 {% extends 'base.html' %}
 
-{% load crispy_forms_tags %}
-
 {% block title  %} Items List {% endblock %}
 
-{% block content  %}
+{% block content  %}     
 
-  {% for message in messages %}
-    <div class="alert alert-danger" role="alert">
-      {{message}}
-    </div>
-  {%endfor%}
-
-  <form method='POST' action=''>
-    {% csrf_token %}
-    {{form|crispy}}
-        <input type="submit" class="btn btn-info" value='Search'/>
-  </form>
-
+  {% if success_message %}          
+      <div class="alert alert-success" role="alert">
+          <strong>{{ success_message }}</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+  {% endif %}
+  {% if error_message %}          
+      <div class="alert alert-danger" role="alert">
+          <strong>{{ error_message }}</strong>
+          <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+          </button>
+      </div>
+  {% endif %} 
   <br>
-    <a href="{% url 'products:items_list_url' %}" class="btn btn-primary btn-lg " role="button" >Show all Items</a>
-    <a href="{% url 'products:item_create_url' %}" class="btn btn-secondary btn-lg "  role="button">Add new Item</a>
+  <a href="{% url 'products:items_list_url' %}" class="btn btn-secondary btn-lg " role="button" >Show all Items</a>
+  <a href="{% url 'products:item_create_url' %}" class="btn btn-info btn-lg " role="button">Add new Item</a>
+  <br><br>
+  <div class="card">
+    <div class="card-body">
+      <form action="" method="POST" class="">
+        {% csrf_token %}  
+            <div class="form-group row">
+              <div class="col-sm-2"><label>Name:</label></div>
+              <div class="col-sm-8"><input type="text" class="form-control" name="name"></div>
+              <div class="col-sm-2"><input type="submit" class="btn btn-info" value='Search'/></div>
+            </div>
+      </form><br>
 
-    <table class="table table-striped">
-      <thead>
-        <tr>
-          <th scope="col">Name</th>
-          <th scope="col">Inventory</th>
-          <th scope="col">EOQ</th>
-          <th scope="col">Reorder Quantity</th>
-        </tr>
-      </thead>
+      <table class="table table-striped">
+        <thead>
+          <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Inventory</th>
+            <th scope="col">EOQ</th>
+            <th scope="col">Reorder Quantity</th>
+          </tr>
+        </thead>
 
-      {% for item in items %}
-          <tbody>            
-            {% if item.total_inventory <= item.rq %}
-              <tr style="color: red;">
-                <th scope="row">{{ item.name }}</th>
-                <td>{{item.total_inventory}}</td>
-                <td>{{item.eoq}}</td>
-                <td>{{item.rq}}</td>
-                <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
-                <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
-              </tr>         
-            {% endif %}
-          </tbody>
-      {% endfor %}
+        {% for item in items %}
+            <tbody>            
+              {% if item.total_inventory <= item.rq %}
+                <tr style="color: red;"> 
+                  <th scope="row">{{ item.name }}</th>
+                  <td>{{item.total_inventory}}</td>
+                  <td>{{item.eoq}}</td>
+                  <td>{{item.rq}}</td>
+                  <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
+                  <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
+                </tr>         
+              {% endif %}
+            </tbody>
+        {% endfor %}
 
-      {% for item in items %}
-          <tbody>            
-            {% if item.total_inventory > item.rq %}
-              <tr>
-                <th scope="row">{{ item.name }}</th>
-                <td>{{item.total_inventory}}</td>
-                <td>{{item.eoq}}</td>
-                <td>{{item.rq}}</td>
-                <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
-                <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
-              </tr>         
-            {% endif %}
-          </tbody>
-      {% endfor %}
-    </table>
+        {% for item in items %}
+            <tbody>            
+              {% if item.total_inventory > item.rq %}
+                <tr>
+                  <th scope="row">{{ item.name }}</th>
+                  <td>{{item.total_inventory}}</td>
+                  <td>{{item.eoq}}</td>
+                  <td>{{item.rq}}</td>
+                  <td><a href="{% url 'products:update_item' item.id %}" class="btn btn-outline-secondary" role="button">Update</a></td>
+                  <td><a href="{% url 'products:delete_items' item.id %}" class="btn btn-outline-danger" role="button">Delete</a></td>
+                </tr>         
+              {% endif %}
+            </tbody>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
 
 {% endblock %}

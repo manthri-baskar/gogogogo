@@ -99,26 +99,27 @@ def add_purchase_view(request):
 
 @login_required(login_url='login')
 def items_list(request):
-    ite   = None
+    all_prod   = None
     total = None
+    error_message = None 
 
     try:
-        ite = request.user.items.all()
-        #ite = Product.objects.all()
+        #ite = request.user.items.all()
+        all_prod   = Product.objects.all().filter(user=request.user)
     except ObjectDoesNotExist:
-        messages.info(request,"There are no items.....")
-    form = ItemSearchForm(request.POST or None)
+        error_message = 'There are no items.....'
 
     if request.method == 'POST':
-            try:
-                ite = request.user.items.filter(name__icontains=form['name'].value())
-            except ObjectDoesNotExist:
-                messages.info(request,"There are no items.....")
+        par_prod  = request.POST.get('name')
+        try:
+            all_prod = Product.objects.all().filter(user=request.user, name__icontains=par_prod)
+        #except ObjectDoesNotExist:
+        except:
+            error_message = 'There are no items.....'
     
     context = {
-        "form": form,
-        "items":ite,
-        "total":total
+        'error_message' :error_message,
+        'items'         :all_prod,
     }
     return render(request,'products/items_list.html',context)
 
@@ -145,65 +146,84 @@ def demand_list(request,*args,**kwargs):
 
 @login_required(login_url='login')
 def ItemCreate(request):
-        form = ItemsForm()
-        if request.method == 'POST':
-            form=ItemsForm(request.POST) 
-            if form.is_valid():
-                n = form.cleaned_data["name"]
-                l = form.cleaned_data["lead_time"]
-                c = form.cleaned_data["carrying_cost"]
-                o = form.cleaned_data["ordering_cost"]
-                t = form.cleaned_data["total_inventory"]
-                u = form.cleaned_data["unit_costprice"]
-                s = form.cleaned_data["service_level"]
-                w = form.cleaned_data["no_of_workingdays"]
-                d = form.cleaned_data["standard_deviation"]
-                a = form.cleaned_data["average_daily_demand"]
+    form            = ItemsForm()
+    all_prod        = Product.objects.all().filter(user=request.user)
+    success_message = None
+    error_message   = None
+    if request.method == 'POST':
+        form=ItemsForm(request.POST) 
+        if form.is_valid():
+            n = form.cleaned_data["name"]
+            l = form.cleaned_data["lead_time"]
+            c = form.cleaned_data["carrying_cost"]
+            o = form.cleaned_data["ordering_cost"]
+            t = form.cleaned_data["total_inventory"]
+            u = form.cleaned_data["unit_costprice"]
+            s = form.cleaned_data["service_level"]
+            w = form.cleaned_data["no_of_workingdays"]
+            d = form.cleaned_data["standard_deviation"]
+            a = form.cleaned_data["average_daily_demand"]
 
-                for i in request.user.items.all():
-                    if i.name==n:
-                        messages.error(request, n +' Item Already Created')
-                        return redirect('products:item_create_url')
-              
-                t = Product(name=n,lead_time=l,average_daily_demand=a,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,service_level=s,no_of_workingdays=w,standard_deviation=d)
-                t.save()
-                request.user.items.add(t) 
-                messages.success(request, n +' Item Created')
-                return redirect('products:items_list_url')
-                    
-        return render(request,'products/item_create.html',context={'form':form, 'product_message':None })
+            for a_prod in all_prod:
+                if a_prod.name==n:
+                    error_message = n +' item is already created'
+                    return render(request,'products/item_create.html',context={'form':form, 'error_message':error_message})
+            
+            t = Product(name=n,lead_time=l,average_daily_demand=a,carrying_cost=c,ordering_cost=o,total_inventory=t,unit_costprice=u,service_level=s,no_of_workingdays=w,standard_deviation=d)
+            t.save()
+            request.user.items.add(t) 
+            success_message = n +' is created'
+            context={
+                "items"           :all_prod,
+                'success_message' :success_message,
+            }
+            return render(request,'products/items_list.html',context)
+
+    context={
+        'form':form, 
+    }                    
+    return render(request,'products/item_create.html',context)
 
 @login_required(login_url='login')
 def delete_items(request,pk):
-    query_set = Product.objects.get(id=pk)
+    par_product = Product.objects.get(id=pk)
+    all_prod    = Product.objects.all().filter(user=request.user)
     
-    if request.method =='POST':
-        query_set.delete()
-        messages.success(request,query_set.name + ' Removed')
-        return redirect('products:items_list_url')
+    if request.method =='GET':
+        par_product.delete()
+        all_prod        = Product.objects.all()
+        success_message = par_product.name+' deleted'
      
     context={
-        'item':query_set.name
-        }
-    return render(request,'products/delete_items.html',context)
+        "items":all_prod,
+    }
+    return render(request,'products/items_list.html',context)
 
 @login_required(login_url='login')
 def update_items(request,pk):
-    query_set = Product.objects.get(id=pk)
-    form      = ItemsForm(instance=query_set)
-    n         = query_set.name
+    par_product     = Product.objects.get(id=pk)
+    form            = ItemsForm(instance=par_product)
+    all_prod        = Product.objects.all().filter(user=request.user)
+    success_message = None
+    error_message   = None
     
     if request.method=='POST': 
-        form = ItemsForm(request.POST,instance=query_set)
+        form = ItemsForm(request.POST,instance=par_product)
         if form.is_valid():
             form.save()
-            messages.info(request, n + '  Updated to ' + query_set.name)
-            return redirect('products:items_list_url')
+            success_message = par_product.name +' is updated'
+            context={
+                "items"           :all_prod,
+                'success_message' :success_message
+            }
+            return render(request,'products/items_list.html',context)
     
     context={
-        'form':form
+        'form'            :form,
+        'success_message' :success_message,
+        'error_message'   :error_message
     }
-    return render(request,'products/update_item.html',context)
+    return render(request,'products/item_create.html',context)
 
 @login_required(login_url='login')
 def calculations(request):

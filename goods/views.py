@@ -100,35 +100,53 @@ def delete_goods(request):
 
 @login_required(login_url='login')
 def add_rawTo_good(request,pk):    
-    all_goods = Goods.objects.all().filter(user=request.user)
-    par_good    = Goods.objects.get(id=pk)
-    goodname=par_good.good_name
+    all_goods       = Goods.objects.all().filter(user=request.user)
+    par_good        = Goods.objects.get(id=pk)
+    goodname        = par_good.good_name
+    success_message = None
+    error_message   = None
     
     if request.method == 'POST': 
-        goodname         = par_good.good_name
-        name             = request.POST.get('name')
-        lead_time        = request.POST.get('lead_time')
-        std              = request.POST.get('std')
-        carry            = request.POST.get('carry_cost')
-        order            = request.POST.get('order_cost')
-        unit_cost        = request.POST.get('unit_cost')
-        demand           = request.POST.get('avg_daily_demand')
-        total_inventory  = request.POST.get('total_inventory')
+        goodname        = par_good.good_name
+        name            = request.POST.get('name')
+        lead_time       = request.POST.get('lead_time')
+        std             = request.POST.get('std')
+        carry           = request.POST.get('carry_cost')
+        order           = request.POST.get('order_cost')
+        unit_cost       = request.POST.get('unit_cost')
+        demand          = request.POST.get('avg_daily_demand')
+        total_inventory = request.POST.get('total_inventory')
+        req_amount      = request.POST.get('req_amount')
 
-        a = 2*300*float(demand)*float(order)
-        b = float(unit_cost)*float(carry)/100
-        eoq  = math.sqrt(a/b)
-        z    = (st.norm.ppf(90/100))
-        rq   = float(lead_time)*float(demand)+float(z)*float(std)*float(lead_time)
+        a   = 2*300*float(demand)*float(order)
+        b   = float(unit_cost)*float(carry)/100
+        eoq = math.sqrt(a/b)
+        z   = (st.norm.ppf(90/100))
+        rq  = float(lead_time)*float(demand)+float(z)*float(std)*float(lead_time)
        
-        good  = Goods.objects.get(good_name=goodname, user=request.user)
+        good        = Goods.objects.get(good_name=goodname, user=request.user)
         raw_to_good = good.raw_material.create(user=request.user, date=datetime.date.today(), 
         name=name, lead_time=lead_time, standard_deviation=std, service_level=90, 
         no_of_workingdays=300, carrying_cost= carry, ordering_cost=order, 
         unit_costprice=unit_cost, average_daily_demand=demand, total_inventory=total_inventory, 
-        eoq=eoq, rq=rq, z=z,  through_defaults={'user':request.user,'required_amount': 0})
-        
-        return redirect('goods:amount_form_url')
+        eoq=eoq, rq=rq, z=z,  through_defaults={'user':request.user,'required_amount': req_amount})
+        all_goods   = Goods.objects.all().filter(user=request.user)
+        all_Amount  = Amount.objects.all().filter(user=request.user)
+
+        try:
+            b               = par_good.raw_material.get(user=request.user, name=name)
+            success_message = name +'raw material is created and added to '+ goodname
+        except:
+            error_message   = name +'raw material is not added to '+ goodname
+
+        context={
+            'success_message' :success_message,
+            'error_message'   :error_message,
+            'all_goods'       :all_goods, 
+            'all_Amount'      :all_Amount
+        }
+        return render(request,'goods/add_amount.html',context)
+        #return redirect('goods:amount_form_url')
 
     context = {
         'all_goods' : all_goods,      
