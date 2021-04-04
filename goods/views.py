@@ -48,22 +48,41 @@ def goods_form_view(request):
         
     return render(request,'goods/add_goods.html',context={'form1': GoodsForm(request.user),'form2':AmountForm(),'items' : items , 'length':len})
 
+
 @login_required(login_url='login')
 def amount_form_view(request):
     all_goods  = Goods.objects.all().filter(user=request.user)
     all_Amount = Amount.objects.all().filter(user=request.user)
+    
+    context={
+        'all_goods':all_goods, 
+        'all_Amount':all_Amount
+    }
+    return render(request,'goods/add_amount.html', context)
+
+
+@login_required(login_url='login')
+def details_form_view(request,pk):
+    par_good   = Goods.objects.get(user=request.user, id=pk)
+    all_goods  = Goods.objects.all().filter(user=request.user)
+    all_Amount = Amount.objects.all().filter(user=request.user)
     if request.method == "POST":
         for a_good in all_goods:
-            for a_raw in a_good.raw_material.all():
-                x = str(a_good.good_name)+' -> '+str(a_raw)
-                req_amount = request.POST.get(x)
-                a_good.raw_material.remove(a_raw)
-                t = Amount(user=request.user, goods=a_good, raw_mate=a_raw, required_amount= req_amount)
-                t.save()
+            if a_good == par_good:
+                for a_raw in a_good.raw_material.all():
+                    x = str(a_good.good_name)+' -> '+str(a_raw)
+                    req_amount = request.POST.get(x)
+                    a_good.raw_material.remove(a_raw)
+                    t = Amount(user=request.user, goods=a_good, raw_mate=a_raw, required_amount= req_amount)
+                    t.save()
 
-    return render(request,'goods/add_amount.html', context={'all_goods':all_goods, 'all_Amount':all_Amount})
+    context={
+        'all_goods' :all_goods, 
+        'all_Amount':all_Amount,
+        'par_good'  :par_good
+    }
+    return render(request,'goods/details.html', context)
 
- 
 
 @login_required(login_url='login')
 def delete_goods(request):

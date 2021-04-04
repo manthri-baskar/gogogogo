@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% block title %} add purchase{% endblock title %}
+
+{% block scripts %} {% endblock %}
+
+{% block content %}
+      
+    {% if success_message %}          
+        <div class="alert alert-success" role="alert">
+            <strong>{{ success_message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+    {% if error_message %}          
+        <div class="alert alert-danger" role="alert">
+            <strong>{{ error_message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %} 
+
+    <form method='POST' action="" class="">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-header"><strong>Goods details</strong><a id="AddForGoods" class="btn btn-info"  href="{% url 'goods:goods_form_url' %}">Add new good</a><a id='DeleteForGoods' class="btn btn-danger" href="{% url 'goods:delete_goods_url' %}">Delete</a> </div>
+                <div class="card-body"> 
+                    {% for a_good in all_goods %}
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-sm-3"><strong>{{a_good.good_name}}:</strong></div>
+                                <div class="col-sm-2"><a href="{% url 'goods:details_form_url' a_good.id %}" class="btn btn-light" role="button">Raw Materials</a></div>
+                                <div class="col-sm-3"><a href="{% url 'goods:update_item_url' a_good.id %}" class="btn btn-light" role="button">Add existing Raw Material</a></div>
+                                <div class="col-sm-3"><a href="{% url 'goods:add_rawTo_good_url' a_good.id %}" class="btn btn-light" role="button">Add New Raw Material</a></div>
+                                <div class="col-sm-1"><a href="{% url 'goods:delete_good_url' a_good.id %}" class="btn btn-light" role="button"><button type="button" class="close" ><span aria-hidden="true">&times;</span></button></a></div>
+                            </div>
+                        </div>
+                        <br>
+                        {% if a_good == par_good %}
+                            <div class="content">
+                                <div class="container">
+                                    <div class="row">
+                                        {% if a_good.raw_material.all %}
+                                            {% for a_raw in a_good.raw_material.all %}
+                                                <div class="col-sm-7"><label for="colFormLabel" class="col-sm-8 col-form-label">{{a_raw.name}}</label></div>
+                                                {% for an_amount in all_Amount %}
+                                                    {% if an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount == 0%}
+                                                        <div class="col-sm-4"><input value="" type="number" class="col-sm-12" placeholder="units required for one {{a_good.good_name}}" name="{{a_good.good_name}} -> {{a_raw}}" required><br></div>
+                                                        {{break}}
+                                                    {% elif an_amount.goods == a_good and an_amount.raw_mate == a_raw and an_amount.required_amount != 0%}
+                                                        <div class="col-sm-4"><input value="{{an_amount.required_amount}}" type="number" class="col-sm-12" placeholder="units required for one {{a_good.good_name}}" name="{{a_good.good_name}} -> {{a_raw}}" required><br></div>
+                                                        {{break}}
+                                                    {% endif %}
+                                                {% endfor %}
+                                                <div class="col-sm-1"><a href="{% url 'goods:remove_rawfromgood_url' a_good.id a_raw.id %}" class="btn btn-light" role="button"><button type="button" class="close" ><span aria-hidden="true">&times;</span></button></a></div>
+                                            {% endfor %}
+                                        {% else %}
+                                            <div class="col-sm-8"><h5 style="color:darkcyan;">no raw materials are entered for this good...</h5><br></div>
+                                        {% endif %}
+                                        <div class="col-sm-1"><a href="{% url 'goods:amount_form_url' %}" class="btn btn-danger" role="button">close</a></div>
+                                        <div class="col-sm-2"><input type="submit" class="btn btn-info" value='save'/></div>
+                                    </div>
+                                </div><hr>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div><br>
+        </div>
+    </form>
+{% endblock %}
