@@ -53,22 +53,33 @@ def goods_form_view(request):
 def amount_form_view(request):
     all_goods  = Goods.objects.all().filter(user=request.user)
     all_Amount = Amount.objects.all().filter(user=request.user)
-    
+    open_goods = list()
     context={
-        'all_goods':all_goods, 
-        'all_Amount':all_Amount
+        'all_goods'  :all_goods, 
+        'all_Amount' :all_Amount,
+        'open_goods' :open_goods
     }
     return render(request,'goods/add_amount.html', context)
 
 
 @login_required(login_url='login')
-def details_form_view(request,pk):
-    par_good   = Goods.objects.get(user=request.user, id=pk)
+def details_form_view(request,pk,pk1):
+    pk         = pk.replace('[','')
+    pk         = pk.replace(']','')
+    pk         = pk.replace("', '",';;')
+    pk         = pk.replace("'",'')
+    open_goods = list(pk.split(';;'))
+    par_good   = Goods.objects.get(user=request.user, id=pk1)
+    if par_good.good_name in open_goods:
+        open_goods.remove(par_good.good_name)
+    else:
+        open_goods.append(par_good.good_name)
+
     all_goods  = Goods.objects.all().filter(user=request.user)
     all_Amount = Amount.objects.all().filter(user=request.user)
     if request.method == "POST":
         for a_good in all_goods:
-            if a_good == par_good:
+            if a_good.good_name in open_goods:
                 for a_raw in a_good.raw_material.all():
                     x = str(a_good.good_name)+' -> '+str(a_raw)
                     req_amount = request.POST.get(x)
@@ -77,9 +88,9 @@ def details_form_view(request,pk):
                     t.save()
 
     context={
-        'all_goods' :all_goods, 
-        'all_Amount':all_Amount,
-        'par_good'  :par_good
+        'all_goods'  :all_goods, 
+        'all_Amount' :all_Amount,
+        'open_goods' :open_goods
     }
     return render(request,'goods/details.html', context)
 

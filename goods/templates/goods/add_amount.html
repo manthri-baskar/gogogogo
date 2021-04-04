@@ -31,7 +31,7 @@
                         <div class="container">
                             <div class="row">
                                 <div class="col-sm-3"><strong>{{a_good.good_name}}:</strong></div>
-                                <div class="col-sm-2"><a href="{% url 'goods:details_form_url' a_good.id %}" class="btn btn-light" role="button">Raw Materials</a></div>
+                                <div class="col-sm-2"><a href="{% url 'goods:details_form_url' open_goods a_good.id %}" class="btn btn-light" role="button">Raw Materials</a></div>
                                 <div class="col-sm-3"><a href="{% url 'goods:update_item_url' a_good.id %}" class="btn btn-light" role="button">Add existing Raw Material</a></div>
                                 <div class="col-sm-3"><a href="{% url 'goods:add_rawTo_good_url' a_good.id %}" class="btn btn-light" role="button">Add New Raw Material</a></div>
                                 <div class="col-sm-1"><a href="{% url 'goods:delete_good_url' a_good.id %}" class="btn btn-light" role="button"><button type="button" class="close" ><span aria-hidden="true">&times;</span></button></a></div>
