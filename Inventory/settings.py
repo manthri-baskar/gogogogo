@@ -44,7 +44,7 @@ INSTALLED_APPS = [
     'products',
     'csvs',
     'goods',
-    'customers'
+    'demand_predict'
 ]
 
 MIDDLEWARE = [

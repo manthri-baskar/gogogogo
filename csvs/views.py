@@ -1,14 +1,59 @@
 from django.shortcuts import render, redirect
 from .forms import CsvForm
 from .models import Csv
-import csv
-import math
 from django.contrib.auth.models import User
+from demand_predict.models import *
+from goods.models import *
 from products.models import Product, Purchase
 from products.forms import *
 from products.views import ItemCreate
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
+import csv
+import math
 
 # Create your views here.
+
+def upload_demand_view(request):
+    error_message   = None
+    success_message = None
+    form = CsvForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        form.save()
+        form = CsvForm()
+        try:
+            obj = Csv.objects.get(activated=False)
+            with open(obj.file_name.path, "r") as csv_file:
+                #reader = csv.reader(x.replace('\0', '') for x in csv_file)
+                reader = csv.reader(csv_file)
+                for row in reader:
+                    user = request.user
+                    try:
+                        par_good = Goods.objects.all().filter(user=request.user, good_name__icontains=row[0].upper())
+                        
+                        goods_demand.objects.create(
+                            user      = user,
+                            item_name = par_good[0],
+                            date      = row[1],
+                            demand    = float(row[2]),
+                        )
+                        success_message = 'successfully uploaded.'
+                    except:
+                        error_message = 'Some of the items in the file maynot have uploaded or check the date format, it should be in y-m-d format.........'
+            print('DONE......DONE......DONE......DONE......DONE......DONE......')
+            obj.activated=True
+            obj.save()
+
+        except:
+            error_message = 'Oops, something went wrong......'
+
+    context={
+        'form'            : form,
+        'error_message'   : error_message,
+        'success_message' : success_message,
+    }
+    return render(request, 'csvs/upload_good_demand.html', context)
+ 
 
 def upload_file_view(request):
     error_message   = None
@@ -19,8 +64,8 @@ def upload_file_view(request):
         form = CsvForm()
         try:
             obj = Csv.objects.get(activated=False)
-            with open(obj.file_name.path, 'r') as f:
-                reader = csv.reader(f)
+            with open(obj.file_name.path, 'r') as csv_file:
+                reader = csv.reader(csv_file)
                 for row in reader:
                     user = request.user
                     try:

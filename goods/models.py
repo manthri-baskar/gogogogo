@@ -24,12 +24,11 @@ class Goods(models.Model):
     raw_material        = models.ManyToManyField(Product, through='Amount')
 
     def __str__(self):
-        return '{} => {}'.format(self.user, self.good_name)
+        return '{} => {}'.format(self.user, self.good_name) 
 
     def save(self, *args, **kwargs):
         self.good_name = self.good_name.upper()
         return super().save(*args, **kwargs)
-
 
 class Amount(models.Model):
     user            = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="amount")
@@ -43,3 +42,13 @@ class Amount(models.Model):
 
     def __str__(self):
         return '{} - {}'.format(self.goods, self.raw_mate.name)
+        
+
+class goods_demand(models.Model):
+    user      = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="good_demand")
+    item_name = models.CharField(max_length=220)
+    date      = models.DateTimeField()
+    demand    = models.PositiveIntegerField()
+
+    def __str__(self):
+        return "{} => {}".format(self.date, self.item_name)

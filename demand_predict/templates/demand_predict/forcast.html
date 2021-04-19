@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block title  %} analyse {% endblock %}
+
+{% block content  %}
+    {{forcast|safe}}
+    {% if error %}
+        {{error|safe}}
+    {% endif %}
+{% endblock %}

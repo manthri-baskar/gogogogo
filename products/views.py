@@ -225,11 +225,11 @@ def update_items(request,pk):
     }
     return render(request,'products/item_create.html',context)
 
-@login_required(login_url='login')
+@login_required(login_url='login') 
 def calculations(request):
     item_df   = pd.DataFrame(Product.objects.all().values().filter(user=request.user))
     demand_df = pd.DataFrame(Purchase.objects.all().values().filter(user=request.user))
-    error = None
+    error     = None
     
     if demand_df.shape[0]>0:
         item_df.rename(columns = {'id':'product_id'}, inplace = True)

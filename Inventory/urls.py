@@ -28,9 +28,9 @@ urlpatterns = [
     path('logout/', v.logoutUser, name="logout"),
     path('performance/', include('products.urls', namespace="products")),
     path('upload/', include('csvs.urls', namespace="csvs")),
-    path('customers/', include('customers.urls', namespace="customer")),
+    path('forcasting/', include('demand_predict.urls', namespace="forcast")),
     path('goods/', include('goods.urls', namespace="goods"))
-]
+] 
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

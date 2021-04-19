@@ -13,9 +13,9 @@ def str_to_list(pk):
     pk          = pk.replace(']','')
     pk          = pk.replace("', '",';;')
     pk          = pk.replace("'",'')
-    str_to_list = list(pk.split(';;'))
+    goods_list = list(pk.split(';;'))
 
-    return str_to_list
+    return goods_list
 
 @login_required(login_url='login')
 def goods_form_view(request):
@@ -252,8 +252,8 @@ def update_items(request,pk,pk1):
 
 @login_required(login_url='login')
 def remove_raw_from_good(request,pk,pk1,pk2):
-    PK             = Goods.objects.get(user=request.user,id=pk)
-    PK2            = Product.objects.get(user=request.user,id=pk2)
+    PK              = Goods.objects.get(user=request.user,id=pk)
+    PK2             = Product.objects.get(user=request.user,id=pk2)
     PK.raw_material.remove(PK2)
     open_goods      = str_to_list(pk1)
     all_goods       = Goods.objects.all().filter(user=request.user)
@@ -275,8 +275,6 @@ def delete_good(request,pk,pk1):
     open_goods = str_to_list(pk1)
     if PK.good_name in open_goods:
         open_goods.remove(PK.good_name)
-    print(pk1)
-    print(open_goods)
     all_goods  = Goods.objects.all().filter(user=request.user)
     all_Amount = Amount.objects.all().filter(user=request.user)
     success_message = PK.good_name + ' is deleted '
