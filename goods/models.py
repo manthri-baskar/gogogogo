@@ -52,3 +52,14 @@ class goods_demand(models.Model):
 
     def __str__(self):
         return "{} => {}".format(self.date, self.item_name)
+
+class company_details(models.Model):
+    user               = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="company")
+    company_name       = models.CharField(max_length=220)
+    periods            = models.PositiveIntegerField()
+    level_sc           = models.FloatField()
+    trend_sc           = models.FloatField()
+    seasonal_factor_sc = models.FloatField()
+    
+    def __str__(self):
+        return "{} => {}".format(self.user, self.company_name)

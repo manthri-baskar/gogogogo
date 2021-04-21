@@ -17,6 +17,26 @@ def str_to_list(pk):
 
     return goods_list
 
+
+@login_required(login_url='login')
+def company_info(request):
+    comp_info = company_details.objects.get(user=request.user)
+    if request.method == 'POST':
+        c = request.POST.get('company')
+        p = request.POST.get('period')
+        l = float(request.POST.get('level_sc'))
+        t = float(request.POST.get('trend_sc'))
+        s = float(request.POST.get('seasonal_factor_sc'))
+        comp_info = company_details.objects.all().filter(user=request.user)
+        comp_info.delete()
+        company   = company_details(user=request.user, company_name=c, periods=p, level_sc=l, trend_sc=t, seasonal_factor_sc=s)
+        company.save()
+
+        return render(request,'goods/company_details.html',context={'comp_info':company})
+
+    return render(request,'goods/company_details.html',context={'comp_info':comp_info})
+
+
 @login_required(login_url='login')
 def goods_form_view(request):
     form   = GoodsForm(request.user)
@@ -39,7 +59,7 @@ def goods_form_view(request):
                 if i.good_name==a.upper():
                     error_message = a +' is already created'
                     context={
-                        'form1'        : GoodsForm(request.user),
+                        'form1'        :GoodsForm(request.user),
                         'form2'        :AmountForm(),
                         'items'        :items, 
                         'length'       :length,
@@ -138,7 +158,7 @@ def add_rawTo_good(request,pk,pk1):
     open_goods      = str_to_list(pk1)
     open_goods.append(goodname)
     success_message = None
-    error_message   = None 
+    error_message   = None  
     
     if request.method == 'POST': 
         goodname        = par_good.good_name
@@ -286,3 +306,4 @@ def delete_good(request,pk,pk1):
             'success_message' :success_message
         }
     return render(request,'goods/details.html',context)
+

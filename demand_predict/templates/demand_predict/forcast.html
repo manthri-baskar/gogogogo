@@ -3,8 +3,67 @@
 {% block title  %} analyse {% endblock %}
 
 {% block content  %}
-    {{forcast|safe}}
-    {% if error %}
-        {{error|safe}}
+<a href="{% url 'csvs:upload_good_demand_url' %}" class="btn btn-secondary btn-lg " role="button" >Upload csv file</a>
+    <br><br>
+    {% if form %}
+        <form action="" method="POST" class="">
+            {% csrf_token %}  
+            <div class="card">
+                <!--div class="card-header"></div-->
+                <div class="card-body">
+                    <div class="form-group">
+                    <label for="exampleFormControlSelect1">Have you uploaded csv file?</label>
+                    <select class="form-control" id="exampleFormControlSelect1" name='file'>
+                        <option>no</option>
+                        <option>yes</option>
+                    </select>
+                    </div><hr>
+                    <h5>Enter demand of previous period (to forcast demand of next period):</h5><br>
+                    <div class="form-group row"><label class="col-sm-4 col-form-label">Year</label><div class="col-sm-6"><input type="number" class="form-control" name="year"></div></div>
+                    <div class="form-group row"><label class="col-sm-4 col-form-label">period</label><div class="col-sm-6"><input type="number" class="form-control" name="period"></div></div>
+                    <hr>
+                    {% for a_good in all_goods %}
+                        <div class="form-group row"><label class="col-sm-4 col-form-label">{{a_good}}</label><div class="col-sm-6"><input type="number" class="form-control" name="{{a_good}}" placeholder="demand in previous period"></div></div>
+                    {% endfor %}
+                    <hr>
+                    <input type="submit" class="btn btn-info" value='forcast'/>
+                </div>
+            </div>
+        </form><br>
     {% endif %}
+    {% if forcast %}
+        {% for a_good in forcast %}   
+            <div class="card">
+                <div class="card-header">{{a_good.item}}</div>
+                <div class="card-body">
+                    <div class="form-group row"><h6 class="col-sm-6">Year</h6><h6 class="col-sm-4">{{a_good.year}}</h6></div>    
+                    <div class="form-group row"><h6 class="col-sm-6">Period</h6><h6 class="col-sm-4">{{a_good.period}}</h6></div>    
+                    <div class="form-group row"><h6 style="color: blue;" class="col-sm-6">Demand Forcast for next period</h6><h6 style="color: blue;" class="col-sm-4">{{a_good.next_demand}}</h6></div>     
+                    <div class="form-group row"><h6 class="col-sm-6">mean squared error</h6><h6 class="col-sm-4">{{a_good.MSEt}}</h6></div>    
+                    <div class="form-group row"><h6 class="col-sm-6">mean absolute deviation</h6><h6 class="col-sm-4">{{a_good.MADt}}</h6></div>    
+                    <div class="form-group row"><h6 class="col-sm-6">mean absolute percentage error</h6><h6 class="col-sm-4">{{a_good.MAPEt}}</h6></div>    
+                    <div class="form-group row"><h6 class="col-sm-6">bias</h6><h6 class="col-sm-4">{{a_good.biast}}</h6></div>    
+                    <div class="form-group row"><h6 class="col-sm-6">tracking signal</h6><h6 class="col-sm-4">{{a_good.TSt}}</h6></div>   
+                </div>
+            </div><br>
+        {% endfor %}
+    {% endif %}
+
+    {% if success_message %}          
+        <div class="alert alert-success" role="alert">
+            <strong>{{ success_message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %}
+
+    {% if error_message %}          
+        <div class="alert alert-danger" role="alert">
+            <strong>{{ error_message }}</strong>
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    {% endif %} 
 {% endblock %}
