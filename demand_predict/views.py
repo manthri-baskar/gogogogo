@@ -48,12 +48,11 @@ def raw_material_demand(comp_info, goods_data):
     res_raw = []
     for a_raw in raw_demand.keys():
         a         = raw_demand[a_raw]
-        m         = sum(a['mean']) / len(a['mean'])
         a['raw']  = a_raw
-        a['std']  = math.sqrt(sum([a['mean'][i] * a['mean'][i] for i in range(len(a['mean']))]+[a['std'][i] * a['std'][i] for i in range(len(a['std']))])/len(a['std']) - m*m)
-        a['mean'] = sum(a['mean'])/len(a['mean'])
+        a['std']  = math.sqrt(sum([a['std'][i] * a['std'][i] for i in range(len(a['std']))]))
+        a['mean'] = sum(a['mean'])
         res_raw.append(a)
-
+    print(res_raw)
     return res_raw
 
 def winters_model_dict(info,pk1,d,y,p):
