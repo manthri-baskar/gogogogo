@@ -3,14 +3,60 @@ from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from products.utils import get_image
 from goods.models import *
+from products.models import *
 from .models import *
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
+import math
 
 # Create your views here.
-def winters_model_dict(info, pk1,d,y,p):
+def raw_material_demand(comp_info, goods_data):
+    good_data = {}
+    for data in goods_data:
+        good_data['%s'%data['item']] = [data['next_demand'], data['std']]
+    all_raw    = Product.objects.all().filter(user=comp_info.user)
+    all_goods  = Goods.objects.all().filter(user=comp_info.user)
+    good_raw_data = {}
+    raw_demand = {}
+    for a_good in all_goods:
+        a = {}
+        all_Amount = Amount.objects.all().filter(user=comp_info.user, goods=a_good.id)
+        for a_amount in all_Amount:
+            a['%s'%a_amount.raw_mate] = a_amount.required_amount
+        good_raw_data['%s'%a_good.good_name] = a
+    for a_good in good_raw_data.keys():
+        a  = good_raw_data[a_good]
+        a1 = good_data['%s'%a_good]
+        for b in a.keys():
+            if b in raw_demand.keys():
+                b1 = a[b]
+                c  = raw_demand[b]
+                c['mean'].append(a1[0]*b1)
+                c['std'].append(a1[1]*b1)
+                raw_demand[b] = c
+            else:
+                raw_demand['%s'%b] = {}
+                b1 = a[b]
+                c  = raw_demand[b]
+                c['mean'] = []
+                c['std']  = []
+                c['mean'].append(a1[0]*b1)
+                c['std'].append(a1[1]*b1)
+                raw_demand[b] = c
+    res_raw = []
+    for a_raw in raw_demand.keys():
+        a         = raw_demand[a_raw]
+        m         = sum(a['mean']) / len(a['mean'])
+        a['raw']  = a_raw
+        a['std']  = math.sqrt(sum([a['mean'][i] * a['mean'][i] for i in range(len(a['mean']))]+[a['std'][i] * a['std'][i] for i in range(len(a['std']))])/len(a['std']) - m*m)
+        a['mean'] = sum(a['mean'])/len(a['mean'])
+        res_raw.append(a)
+
+    return res_raw
+
+def winters_model_dict(info,pk1,d,y,p):
     alpha = info.level_sc
     beta  = info.trend_sc
     gaama = info.seasonal_factor_sc
@@ -100,15 +146,15 @@ def demand_prediction(request):
         forcast       = None
         error         = 'no data available'
         form          = None
+        raw_demand    = None
         return render(request,'demand_predict/forcast.html',context={'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
     forcast       = None
     error         = None
     form          = True
+    raw_demand    = None
     all_goods     = []
-    print(all_goodnames)
     for A in all_goodnames.values:
         all_goods.append(A)
-    print(all_goods)
     all_past_data = past_data.objects.all().filter(user=request.user)
 
     if request.method == 'POST': 
@@ -168,8 +214,9 @@ def demand_prediction(request):
                         save_table.save()
                     past_dict['next_demand']  = int((past_dict['level'] + past_dict['trend'])*past_dict['next_1'])
                     forcast.append(past_dict)
+                raw_demand = raw_material_demand(comp_info, forcast)
 
-            return render(request,'demand_predict/forcast.html',context={'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
+            return render(request,'demand_predict/forcast.html',context={'raw_demand':raw_demand, 'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
         
         else:
             form    = False
@@ -184,9 +231,10 @@ def demand_prediction(request):
                 save_table = past_data(user=request.user, good_name=pk1_dict['item'], demand_List = str(table))
                 save_table.save()
                 forcast.append(table)
-            return render(request,'demand_predict/forcast.html',context={'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
+            raw_demand = raw_material_demand(comp_info, forcast)
+            return render(request,'demand_predict/forcast.html',context={'raw_demand':raw_demand, 'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
 
-    return render(request,'demand_predict/forcast.html',context={'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
+    return render(request,'demand_predict/forcast.html',context={'raw_demand':raw_demand, 'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
 
  
 def sim_linear_reg(x,y):

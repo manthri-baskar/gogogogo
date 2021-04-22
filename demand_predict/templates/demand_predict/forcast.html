@@ -36,9 +36,12 @@
             <div class="card">
                 <div class="card-header">{{a_good.item}}</div>
                 <div class="card-body">
+                    <div class="form-group row"><h6 style="color: blue;" class="col-sm-6">Demand Forcast for next period</h6><h6 style="color: blue;" class="col-sm-4">{{a_good.next_demand}}</h6></div>    
+                    <div class="form-group row"><h6 style="color: blue;" class="col-sm-6">Standard deviation of demand</h6><h6 style="color: blue;" class="col-sm-4">{{a_good.std}}</h6></div> 
+                    <hr>
+                    <u><h6><strong>Error analysis of demand forcasting method:</strong> </h6></u>   
                     <div class="form-group row"><h6 class="col-sm-6">Year</h6><h6 class="col-sm-4">{{a_good.year}}</h6></div>    
                     <div class="form-group row"><h6 class="col-sm-6">Period</h6><h6 class="col-sm-4">{{a_good.period}}</h6></div>    
-                    <div class="form-group row"><h6 style="color: blue;" class="col-sm-6">Demand Forcast for next period</h6><h6 style="color: blue;" class="col-sm-4">{{a_good.next_demand}}</h6></div>     
                     <div class="form-group row"><h6 class="col-sm-6">mean squared error</h6><h6 class="col-sm-4">{{a_good.MSEt}}</h6></div>    
                     <div class="form-group row"><h6 class="col-sm-6">mean absolute deviation</h6><h6 class="col-sm-4">{{a_good.MADt}}</h6></div>    
                     <div class="form-group row"><h6 class="col-sm-6">mean absolute percentage error</h6><h6 class="col-sm-4">{{a_good.MAPEt}}</h6></div>    
@@ -47,6 +50,18 @@
                 </div>
             </div><br>
         {% endfor %}
+    {% endif %}
+
+    {% if raw_demand %}          
+        <div class="card"> 
+            <div class="card-header">Raw material demand forcast for next period</div>
+            <div class="card-body">
+                {% for a_raw in raw_demand %}
+                            <div class="form-group row"><h6 class="col-sm-6"><strong>{{a_raw.raw}}</strong></h6></div>    
+                            <div class="form-group row"><h6 class="col-sm-3">mean demand:</h6><h6 style="color: blue;" class="col-sm-3">{{a_raw.mean}}</h6><h6 class="col-sm-3">standard deviation:</h6><h6 style="color: blue;" class="col-sm-3">{{a_raw.std}}</h6></div> 
+                {% endfor %}
+            </div>
+        </div><br>
     {% endif %}
 
     {% if success_message %}          

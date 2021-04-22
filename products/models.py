@@ -29,7 +29,7 @@ class Product(models.Model):
     date                 = models.DateTimeField(auto_now_add=True)
     lead_time            = models.PositiveIntegerField(default='0',blank=True,null=True,validators=[validate_zero])
     service_level        = models.PositiveIntegerField(default='90',blank=True,null=True,validators=[validate_even])
-    standard_deviation   = models.DecimalField(default='5', max_digits=6, decimal_places=3, blank=True,null=True)
+    standard_deviation   = models.DecimalField(default='5', max_digits=10, decimal_places=3, blank=True,null=True)
     carrying_cost        = models.PositiveIntegerField(default='12',blank=False,validators=[validate_even],help_text='Enter as percentage of unit cost')
     ordering_cost        = models.PositiveIntegerField(default='0',blank=False,null=True)
     unit_costprice       = models.PositiveIntegerField(default='0',blank=False,null=True,validators=[validate_zero])
