@@ -84,9 +84,9 @@ def add_purchase_view(request):
                 l = form.cleaned_data["quantity"]
                 c = form.cleaned_data["price"]
                 o = form.cleaned_data["recieved"] 
-                d = form.cleaned_data["date"]
+                d = form.cleaned_data["date"] 
 
-                reporter = request.user.items.get(name=n, user=request.user)
+                reporter = request.user.items.get(name=n.name, user=request.user)
                 reporter.total_inventory = F('total_inventory')-l+o
                 reporter.save()
                 t = Purchase(product=n,quantity=l,price=c,recieved=o,date=d)

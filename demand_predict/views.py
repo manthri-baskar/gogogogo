@@ -52,7 +52,7 @@ def raw_material_demand(comp_info, goods_data):
         a['std']  = math.sqrt(sum([a['std'][i] * a['std'][i] for i in range(len(a['std']))]))
         a['mean'] = sum(a['mean'])
         res_raw.append(a)
-    print(res_raw)
+
     return res_raw
 
 def winters_model_dict(info,pk1,d,y,p):
