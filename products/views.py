@@ -17,12 +17,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
+from goods.models import Goods,Amount
 
 # Create your views here.
 
 @login_required(login_url='login')
 def chart_select_view(request):
-    error_message = None
+    error_message = None 
     df = None
     graph = None
     Quantity = None
@@ -41,7 +42,7 @@ def chart_select_view(request):
             chart_type = request.POST.get('plot')
             date_from  = request.POST.get('date_from') 
             date_to    = request.POST.get('date_to') 
-            item       = request.POST.get('item')
+            item       = request.POST.get('item') 
             
             df['date'] = df['date'].apply(lambda x: x.strftime('%Y-%m-%d'))
             df2        = df.groupby(['date','name'], as_index=False)['quantity'].agg('sum')
@@ -76,26 +77,19 @@ def chart_select_view(request):
 
 @login_required(login_url='login')
 def add_purchase_view(request):
-        form=PurchaseForm(request.user)
-        if request.method == 'POST':
-            form=PurchaseForm(request.user,request.POST) 
-            if form.is_valid():
-                n = form.cleaned_data["product"]
-                l = form.cleaned_data["quantity"]
-                c = form.cleaned_data["price"]
-                o = form.cleaned_data["recieved"] 
-                d = form.cleaned_data["date"]
-
-                reporter = request.user.items.get(name=n, user=request.user)
-                reporter.total_inventory = F('total_inventory')-l+o
-                reporter.save()
-                t = Purchase(product=n,quantity=l,price=c,recieved=o,date=d)
-                t.save()
-                request.user.demand.add(t)
-                
-                return redirect('products:add-purchase-view')
-                    
-        return render(request,'products/add.html',context={'form':PurchaseForm(request.user) })
+    all_goods = Goods.objects.all().filter(user=request.user)
+    if request.method == 'POST':
+        name = request.POST.get('good')
+        quantity = request.POST.get('quantity')
+        par_good=Goods.objects.get(good_name=name,user=request.user)
+        b = par_good.raw_material.all()
+        for product in b:
+            reporter = Product.objects.get(name=product,user=request.user)
+            amount = Amount.objects.get(goods=par_good, raw_mate=product)
+            realq=amount.required_amount
+            reporter.total_inventory = F('total_inventory')- (float(realq)*float(quantity))
+            reporter.save()
+    return render(request,'products/add.html',context={'all_goods' : all_goods })
 
 @login_required(login_url='login')
 def items_list(request):
