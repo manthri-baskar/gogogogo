@@ -41,7 +41,7 @@ class Product(models.Model):
     z                    = models.DecimalField(max_digits=4,decimal_places=3,default='0',blank=True,null=True)
 
     def __str__(self):
-        return '{} => {}'.format(self.user, self.name)
+        return self.name
     
     def save(self, *args, **kwargs):
         self.name = self.name.upper()

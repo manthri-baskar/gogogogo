@@ -4,14 +4,23 @@
 {% block title %} add purchase{% endblock title %}
 
 {% block content %}
+<form action="{% url 'products:add-purchase-view' %}" method="POST" class="">
+    {% csrf_token %}  
     <div class="card">
         <div class="card-header"><strong>Add</strong></div>
         <div class="card-body">
-        <form action="" method="post">
-            {% csrf_token %}
-            {{ form|crispy }}
-            <button type="submit" class="btn btn-primary">Submit</button>
-        </form>
+            <div class="form-group">
+                <label for="exampleDataList" class="form-label">Good:</label>
+                <input class="form-control" list="datalistOptions1" id="exampleDataList" placeholder="" type="text" name="good">
+                <datalist id="datalistOptions1">
+                    {% for a_good in all_goods %} 
+                        <option value="{{ a_good.good_name }}">
+                    {% endfor %}
+                </datalist><br>
+                <input type="number" class="form-control" name="quantity" placeholder='Quantity'min="1" required><br>
+                <input type="submit" class="btn btn-info" value='Add'/>
+            </div>
         </div>
     </div>
+</form>
 {% endblock %}

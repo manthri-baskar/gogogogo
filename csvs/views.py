@@ -36,6 +36,7 @@ def upload_demand_view(request):
                             item_name = par_good[0],
                             date      = row[1],
                             demand    = float(row[2]),
+                            place     = row[3],
                         )
                         success_message = 'successfully uploaded.'
                     except:

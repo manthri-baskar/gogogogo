@@ -1,17 +1,83 @@
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
-from products.utils import get_image
 from goods.models import *
 from products.models import *
 from .models import *
+from .utils import *
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 import math
+from django.db.models.expressions import F
 
 # Create your views here.
+def str_to_list(pk):
+    pk          = pk.replace('[','')
+    pk          = pk.replace(']','')
+    pk          = pk.replace("', '",';;')
+    pk          = pk.replace("'",'')
+    all_places = list(pk.split(';;'))
+
+    return all_places
+
+@login_required(login_url='login')
+def chart_select_view(request):
+    error_message = None
+    df = None
+    graph = None
+    Quantity = None
+    comp_info  = company_details.objects.get(user=request.user)
+    all_places = places.objects.get(user=request.user)
+    all_places = str_to_list(all_places.places_List)
+    goods      = Goods.objects.all().filter(user=request.user)
+    g_demand   = pd.DataFrame(goods_demand.objects.all().values().filter(user=request.user))
+    
+    if g_demand.shape[0]>0 :
+        if request.method == 'POST': 
+            xaxis         = request.POST.get('xaxis') 
+            yaxis         = request.POST.get('yaxis') 
+            good          = request.POST.get('good') 
+            place         = request.POST.get('place')
+            all_data      = past_csv_data.objects.get(user=request.user, good_name=good, place=place) 
+            all_data_dict = eval(all_data.demand_List)
+            all_data_df   = pd.DataFrame(all_data_dict)
+            all_data_df   = all_data_df.drop(labels=0, axis=0)
+            for a in range(comp_info.periods):
+                all_data_df = all_data_df.drop(labels=len(all_data_df), axis=0)
+            all_data_df['year']        = all_data_df['year'].apply(str)
+            all_data_df['period']      = all_data_df['period'].apply(str)
+            all_data_df['forcast']     = (all_data_df['level'].apply(float) + all_data_df['trend'].apply(float))*all_data_df['seasonal_factor'].apply(float)
+            all_data_df['year/period'] = all_data_df['year']+', '+all_data_df['period']
+            graph = get_simple_plot(x=all_data_df[xaxis], y=all_data_df[yaxis] ,place=place, xaxis=xaxis, yaxis=yaxis)
+            '''if chart_type!="":
+                if item!="":
+                    if date_from!="" and date_to!="":
+                        df  = df[(df['date']>date_from)&(df['date']<date_to)]
+                        df2 = df.groupby(['date','name'], as_index=False)['quantity'].agg('sum')
+                        df2 = df2[df2["name"].isin([item])]
+                    # function to get a graph
+                    graph = get_simple_plot(chart_type, x=df2['date'], y=df2['quantity'] ,data=df)
+                else:
+                    error_message = 'please enter an good to continue'
+            else:
+                error_message = 'please select a chart to continue'''
+
+    else:
+        error_message = 'no records in database'
+        
+    context ={
+        'error_message': error_message,
+        'graph' : graph,
+        'Quantity' : Quantity,
+        'goods' : goods,
+        'all_places':all_places,
+    }
+    return render(request, 'demand_predict/chart.html', context)
+
+
 def raw_material_demand(comp_info, goods_data):
     good_data = {}
     for data in goods_data:
@@ -52,7 +118,7 @@ def raw_material_demand(comp_info, goods_data):
         a['std']  = math.sqrt(sum([a['std'][i] * a['std'][i] for i in range(len(a['std']))]))
         a['mean'] = sum(a['mean'])
         res_raw.append(a)
-    print(res_raw)
+
     return res_raw
 
 def winters_model_dict(info,pk1,d,y,p):
@@ -86,7 +152,6 @@ def winters_model_dict(info,pk1,d,y,p):
     pk1_dict   = pk1.to_dict('records')[0]
     del_list   = past_data.objects.get(user=info.user, good_name=pk1_dict['item'])
     del_list.delete()
-    print(str(pk1_dict))
     pk1_dict['next_demand']  = int((pk1_dict['level'] + pk1_dict['trend'])*pk1_dict['next_1'])
 
     return pk1_dict
@@ -131,6 +196,68 @@ def winters_model_shape(info,pk1,p):
         
     return pk1
 
+def forcast_method(g_demand, comp_info, p, place, all_goods):
+    data = {}
+    for i in all_goods:
+        data['%s' %i] = []
+    forcast = []
+    p0 = int(12/p); error = None; df2 = None
+    p1 = int(p0*30)
+    g_demand.rename(columns={'id':'demand_id'}, inplace = True)
+    g_demand['year']          = g_demand['date'].dt.strftime('%Y')
+    g_demand['month']         = g_demand['date'].dt.strftime('%m')
+    g_demand['month']         = g_demand['month'].astype(int) #converting str column into int
+    g_demand['month_2']       = g_demand['month'] - 1
+    g_demand['period']        = g_demand['month_2']//p0 + 1
+    g_demand                  = g_demand.groupby(['year','period','item_name'], as_index=False).aggregate({'demand': 'sum'}) 
+    all_goods                 = []
+    g_demand[['user','item']] = g_demand.item_name.str.split(" => ",expand=True)  
+    del [g_demand['user'], g_demand['item_name']]
+    
+    inter = g_demand.values #convert dataframe to array
+    for B in inter.tolist(): #convert array to list
+        if B[3] in all_goods:
+            data['%s' %B[3]].append(B)
+        else:
+            all_goods.append(B[3])
+            data['%s' %B[3]].append(B)
+    data0 = {}
+    for C in all_goods:
+        table         = data['%s' %C]
+        table         = pd.DataFrame(table)
+        table.columns = ['year','period','demand','item']
+        table         = table[['year','period','item','demand']] #swaping the columns in dataframe
+        table1        = trend_seasonal(table, p)
+        table2        = winters_model_shape(comp_info,table1, p)
+        table2_dict   = table2.to_dict('list')
+        try:    
+            del_list = past_csv_data.objects.get(user=comp_info.user, good_name=C, place=place)
+            del_list.delete()                      
+            save_table = past_csv_data(user=comp_info.user, good_name=C, place=place, demand_List = str(table2_dict))
+            save_table.save()
+        except:
+            save_table = past_csv_data(user=comp_info.user, good_name=C, place=place, demand_List = str(table2_dict))
+            save_table.save()
+        past_dict        = table2.to_dict('records')[table2.shape[0]-p-1]
+        past_dict['n']   = table2.shape[0]-p-1
+        past_dict['std'] = 1.25*past_dict['MADt'] 
+        past_dict_df     = pd.DataFrame([past_dict]) # converting dictionary to dataframe 
+        for j in range(1,p+1):
+            past_dict['next_%s' %j] = table2.loc[table2.shape[0]-p-1+j,'seasonal_factor']
+        past_dict['place'] = place
+        try:    
+            del_list = past_data.objects.get(user=comp_info.user, good_name=C, place=place)
+            del_list.delete()                      
+            save_table = past_data(user=comp_info.user, good_name=C, place=place, demand_List = str(past_dict))
+            save_table.save()
+        except:
+            save_table = past_data(user=comp_info.user, good_name=C, place=place, demand_List = str(past_dict))
+            save_table.save()
+        past_dict['next_demand'] = int((past_dict['level'] + past_dict['trend'])*past_dict['next_1'])
+        forcast.append(past_dict)
+    raw_demand = raw_material_demand(comp_info, forcast)
+
+    return raw_demand, forcast
        
 @login_required(login_url='login') 
 def demand_prediction(request):
@@ -157,63 +284,47 @@ def demand_prediction(request):
     all_past_data = past_data.objects.all().filter(user=request.user)
 
     if request.method == 'POST': 
-        form    = False
-        forcast = []
-        confirm = request.POST.get('file')
-        year    = request.POST.get('year')
-        period  = request.POST.get('period')
+        form         = False
+        place_demand = {}
+        confirm      = request.POST.get('file')
+        year         = request.POST.get('year')
+        period       = request.POST.get('period')
         if all_past_data.count() == 0 or confirm == 'yes':
             data = {}
             for i in all_goods:
                 data['%s' %i] = []
             p  = comp_info.periods #number of periods in a year
             p0 = int(12/p); error = None; df2 = None
+            p1 = int(p0*30)
 
             if g_details.shape[0]>0:
-                g_demand.rename(columns={'id':'demand_id'}, inplace = True)
-                g_demand['year']          = g_demand['date'].dt.strftime('%Y')
-                g_demand['month']         = g_demand['date'].dt.strftime('%m')
-                g_demand['month']         = g_demand['month'].astype(int) #converting str column into int
-                g_demand['month_2']       = g_demand['month'] - 1
-                g_demand['period']        = g_demand['month_2']//p0 + 1
-                g_demand                  = g_demand.groupby(['year','period','item_name'], as_index=False).aggregate({'demand': 'sum'}) 
-                all_goods                 = []
-                g_demand[['user','item']] = g_demand.item_name.str.split(" => ",expand=True)  
-                del [g_demand['user'], g_demand['item_name']]
-                inter = g_demand.values #convert dataframe to array
-                for B in inter.tolist(): #conert array to list
-                    if B[3] in all_goods:
-                        data['%s' %B[3]].append(B)
-                    else:
-                        all_goods.append(B[3])
-                        data['%s' %B[3]].append(B)
-                data0 = {}
-                for C in all_goods:
-                    table         = data['%s' %C]
-                    table         = pd.DataFrame(table)
-                    table.columns = ['year','period','demand','item']
-                    table         = table[['year','period','item','demand']] #swaping the columns in dataframe
-                    table1        = trend_seasonal(table, p)
-                    table2        = winters_model_shape(comp_info,table1, p)
-
-                    past_dict        = table2.to_dict('records')[table2.shape[0]-p-1]
-                    past_dict['n']   = table2.shape[0]-p-1
-                    past_dict['std'] = 1.25*past_dict['MADt'] 
-                    past_dict_df     = pd.DataFrame([past_dict]) # converting dictionary to dataframe 
-                    for j in range(1,p+1):
-                        past_dict['next_%s' %j] = table2.loc[table2.shape[0]-p-1+j,'seasonal_factor']
-                    
-                    try:    
-                        del_list = past_data.objects.get(user=request.user, good_name=C)
-                        del_list.delete()                        
-                        save_table  = past_data(user=request.user, good_name=C, demand_List = str(past_dict))
-                        save_table.save()
-                    except:
-                        save_table  = past_data(user=request.user, good_name=C, demand_List = str(past_dict))
-                        save_table.save()
-                    past_dict['next_demand']  = int((past_dict['level'] + past_dict['trend'])*past_dict['next_1'])
-                    forcast.append(past_dict)
-                raw_demand = raw_material_demand(comp_info, forcast)
+                g_demand_1  = g_demand.groupby(['place'], as_index=False).aggregate({'demand': 'sum'})
+                #
+                abc = g_demand_1.loc[:,'place']
+                all_places = []
+                for a in abc:
+                    all_places.append(a)
+                try:    
+                    del_list = places.objects.get(user=request.user)
+                    del_list.delete()                      
+                    save_table = places(user=request.user, places_List = str(all_places))
+                    save_table.save()
+                except:
+                    save_table = places(user=request.user, places_List = str(all_places))
+                    save_table.save()
+                dict_g_demand_1           = g_demand_1.to_dict('records')
+                for a in dict_g_demand_1:
+                    g_demand_0 = g_demand[g_demand['place'] == a['place']]
+                    place_demand['%s'%a['place']] = forcast_method(g_demand_0, comp_info, p, a['place'], all_goods)
+                place    = 'all'    
+                g_demand = g_demand.drop(columns = 'place')
+                g_demand = g_demand.groupby(['date','item_name','id'], as_index=False).aggregate({'demand': 'sum'})
+                raw_demand, forcast = forcast_method(g_demand, comp_info, p, place, all_goods)
+                for i in raw_demand:
+                    reporter = Product.objects.get(name=i['raw'],user=request.user)
+                    reporter.average_daily_demand = i['mean']/p1
+                    reporter.standard_deviation=i['std']/math.sqrt(p1)
+                    reporter.save()
 
             return render(request,'demand_predict/forcast.html',context={'raw_demand':raw_demand, 'all_goods':all_goods, 'form':form, 'forcast':forcast, 'error_message':error})
         
@@ -227,7 +338,7 @@ def demand_prediction(request):
                 d          = request.POST.get(a_good)
                 user       = request.user
                 table      = winters_model_dict(comp_info, df, d, year, period)
-                save_table = past_data(user=request.user, good_name=pk1_dict['item'], demand_List = str(table))
+                save_table = past_data(user=request.user, good_name=table['item'], demand_List = str(table))
                 save_table.save()
                 forcast.append(table)
             raw_demand = raw_material_demand(comp_info, forcast)

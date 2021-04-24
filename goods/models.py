@@ -49,9 +49,10 @@ class goods_demand(models.Model):
     item_name = models.CharField(max_length=220)
     date      = models.DateTimeField()
     demand    = models.PositiveIntegerField()
+    place     = models.CharField(max_length=220, default='rayachoty') 
 
     def __str__(self):
-        return "{} => {}".format(self.date, self.item_name)
+        return "{} => {}".format(self.place, self.item_name)
 
 class company_details(models.Model):
     user               = models.ForeignKey(User, on_delete=models.CASCADE, null=True, related_name="company")

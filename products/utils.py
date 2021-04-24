@@ -5,7 +5,7 @@ from io import BytesIO
 from datetime import datetime, timedelta
 import base64
 from django.contrib.auth.models import User
-
+ 
 def get_salesman_from_id(val):
     print(val)
     user = User.objects.get(id=val)
@@ -31,7 +31,7 @@ def get_image():
 
 def get_simple_plot(chart_type, *args, **kwargs):
     plt.switch_backend('AGG')
-    fig = plt.figure(figsize=(15,4))
+    fig = plt.figure(figsize=(12,4))
     x   = kwargs.get('x')
     y   = kwargs.get('y')
     data = kwargs.get('data')

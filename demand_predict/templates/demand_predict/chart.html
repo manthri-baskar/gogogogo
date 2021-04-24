@@ -1,0 +1,69 @@
+{% extends 'base.html'%}
+
+{% block title %}chart{% endblock title %} 
+
+{% block content %} 
+    <div>
+        <div class="">
+            {% if request.POST %}
+                {% if graph %}
+                    <img src="data:image/png;base64, {{ graph | safe}}">
+                {% endif %}
+            {% endif %}
+        </div>
+        <form action="" method="POST">
+            {% csrf_token %}                
+            <div class="card">
+                <div class="card-header">Chart</div>
+                <div class="card-body">  
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="inputState">x-axis of chart:</label>
+                            <select id="inputState" name="xaxis" class="form-control">
+                                <option selected></option>
+                                <option value="year/period">period</option>
+                                <option value="demand">demand</option>
+                                <option value="forcast">forcast</option>
+                            </select>
+                        </div>  
+                        <div class="form-group col-md-6">
+                            <label for="inputState">y-axis of chart:</label>
+                            <select id="inputState" name="yaxis" class="form-control">
+                                <option selected></option>
+                                <option value="demand">demand</option>
+                                <option value="forcast">forcast</option>
+                                <option value="error">forcast error</option>
+                                <option value="TSt">tracking signal</option>
+                            </select>
+                        </div> 
+                    </div>                  
+                    <label for="exampleDataList" class="form-label">place:</label>
+                    <input class="form-control" list="datalistOptions" id="exampleDataList" type="text" name="place">
+                    <datalist id="datalistOptions">
+                        <option value="all">
+                        {% for a_place in all_places %}
+                            <option value="{{a_place}}">
+                        {% endfor %}
+                    </datalist><br>  
+                    <label for="exampleData" class="form-label">good:</label>
+                    <input class="form-control" list="datalist" id="exampleData" type="text" name="good">
+                    <datalist id="datalist">
+                        {% for a_good in goods %}
+                            <option value="{{a_good.good_name}}">
+                        {% endfor %}
+                    </datalist><br>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </div>
+            </div><br>
+                        
+            {% if error_message %}          
+                <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                    <strong>{{ error_message }}</strong>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+{% endblock content %}

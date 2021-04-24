@@ -141,7 +141,7 @@ def delete_goods(request):
         if action == 'good_raw':
             dele_good.raw_material.remove(dele_raw)
 
-    context = {
+    context = { 
         'all_goods' : all_goods,
         'all_raw'   : all_raw
     }
