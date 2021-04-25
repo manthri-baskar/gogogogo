@@ -20,7 +20,10 @@ def str_to_list(pk):
 
 @login_required(login_url='login')
 def company_info(request):
-    comp_info = company_details.objects.get(user=request.user)
+    try:
+        comp_info = company_details.objects.get(user=request.user)
+    except:
+        comp_info = None
     if request.method == 'POST':
         c = request.POST.get('company')
         p = request.POST.get('period')
