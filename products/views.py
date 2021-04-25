@@ -76,17 +76,17 @@ def chart_select_view(request):
     return render(request, 'products/main.html', context)
 
 @login_required(login_url='login')
-def add_purchase_view(request):
+def add_goods_view(request):
     all_goods = Goods.objects.all().filter(user=request.user)
     if request.method == 'POST':
-        name = request.POST.get('good')
+        name     = request.POST.get('good')
         quantity = request.POST.get('quantity')
-        par_good=Goods.objects.get(good_name=name,user=request.user)
-        b = par_good.raw_material.all()
+        par_good = Goods.objects.get(good_name=name,user=request.user)
+        b        = par_good.raw_material.all()
         for product in b:
             reporter = Product.objects.get(name=product,user=request.user)
-            amount = Amount.objects.get(goods=par_good, raw_mate=product)
-            realq=amount.required_amount
+            amount   = Amount.objects.get(goods=par_good, raw_mate=product)
+            realq    = amount.required_amount
             reporter.total_inventory = F('total_inventory')- (float(realq)*float(quantity))
             reporter.save()
     return render(request,'products/add.html',context={'all_goods' : all_goods })

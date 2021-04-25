@@ -5,7 +5,7 @@ app_name = 'products'
  
 urlpatterns = [
     path('', chart_select_view, name='main-products-view'),
-    path('add/',add_purchase_view, name='add-purchase-view'),
+    path('add/',add_goods_view, name='add-purchase-view'),
     #path('sales/',sales_dist_view, name='sales-view'),    
     path('items/',items_list,name='items_list_url'),
     path('demand/',demand_list,name='demand_list_url'),
